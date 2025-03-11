@@ -9,7 +9,7 @@ const FeaturesSection = () => {
       image: '/images/ghana.png',
       link: '/cause-lists',
       linkText: 'View Cause Lists',
-      buttonClassName: 'px-5 py-2 bg-red-100 text-gray-700 font-medium inline-flex items-center w-fit'
+      buttonClassName: 'px-4 py-2 bg-red-100 text-gray-700 font-medium inline-flex items-center rounded hover:bg-red-200 transition-colors'
     },
     {
       title: 'Notices',
@@ -17,7 +17,7 @@ const FeaturesSection = () => {
       image: '/images/notice.jpeg',
       link: '/notices',
       linkText: 'Browse Notices',
-      buttonClassName: 'px-5 py-2 bg-blue-100 text-gray-700 font-medium inline-flex items-center w-fit'
+      buttonClassName: 'px-4 py-2 bg-blue-100 text-gray-700 font-medium inline-flex items-center rounded hover:bg-blue-200 transition-colors'
     },
     {
       title: 'Archives',
@@ -25,27 +25,28 @@ const FeaturesSection = () => {
       image: '/images/archive.jpeg',
       link: '/archives',
       linkText: 'Explore Archives',
-      buttonClassName: 'px-5 py-2 bg-amber-100 text-gray-700 font-medium inline-flex items-center w-fit'
+      buttonClassName: 'px-4 py-2 bg-amber-100 text-gray-700 font-medium inline-flex items-center rounded hover:bg-amber-200 transition-colors'
     }
   ];
 
   return (
-    <section className="py-16">
+    <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <div key={index} className="flex flex-col bg-[#F3F5F8] p-4">
-              <div className="mb-6 relative h-64 overflow-hidden">
+            <div key={index} className="flex flex-col bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+              <div className="mb-6 relative h-64 overflow-hidden rounded-lg">
                 <Image
                   src={feature.image}
                   alt={feature.title}
                   fill
                   className="object-cover"
                   priority={index === 0}
+                  sizes="(max-width: 768px) 100vw, 33vw"
                 />
               </div>
               <h3 className="text-2xl font-bold text-[#01292D] mb-3">{feature.title}</h3>
-              <p className="text-[#464646] mb-4 flex-grow">{feature.description}</p>
+              <p className="text-[#464646] mb-6 flex-grow">{feature.description}</p>
               <Link 
                 href={feature.link}
                 className={feature.buttonClassName}
