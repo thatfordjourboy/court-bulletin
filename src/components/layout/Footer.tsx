@@ -5,9 +5,9 @@ const Footer = () => {
     <footer className="bg-[#01292D] text-white">
       <div className="max-w-[1440px] mx-auto">
         <div className="px-16 lg:px-24 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8">
+          <div className="flex flex-col md:flex-row flex-wrap gap-y-8">
             {/* GH Court Bulletin Section */}
-            <div className="lg:col-span-2 space-y-2">
+            <div className="md:w-1/2 lg:w-[180px] space-y-2">
               <h3 className="text-sm font-semibold text-[#F3F5F8] whitespace-nowrap">GH Court Bulletin</h3>
               <ul className="space-y-1.5">
                 <li>
@@ -30,7 +30,7 @@ const Footer = () => {
             </div>
 
             {/* Sitemap Section */}
-            <div className="lg:col-span-2 space-y-2">
+            <div className="md:w-1/2 lg:w-[180px] lg:ml-8 space-y-2">
               <h3 className="text-sm font-semibold text-[#F3F5F8]">Sitemap</h3>
               <ul className="space-y-1.5">
                 <li>
@@ -69,7 +69,7 @@ const Footer = () => {
             </div>
 
             {/* Get in touch Section */}
-            <div className="lg:col-span-1 space-y-2">
+            <div className="md:w-1/2 lg:w-[120px] lg:ml-8 space-y-2">
               <h3 className="text-sm font-semibold text-[#F3F5F8]">Get in touch</h3>
               <ul className="space-y-1.5">
                 <li>
@@ -89,7 +89,7 @@ const Footer = () => {
             </div>
 
             {/* Policies Section */}
-            <div className="lg:col-span-1 space-y-2">
+            <div className="md:w-1/2 lg:w-[120px] lg:ml-8 space-y-2">
               <h3 className="text-sm font-semibold text-[#F3F5F8]">Policies</h3>
               <ul className="space-y-1.5">
                 <li>
@@ -112,9 +112,9 @@ const Footer = () => {
             </div>
 
             {/* Newsletter Section */}
-            <div className="lg:col-span-3 space-y-2">
+            <div className="md:w-full lg:w-[300px] lg:ml-4 space-y-2">
               <h3 className="text-sm font-semibold text-[#F3F5F8]">Subscribe to our newsletter</h3>
-              <div className="flex">
+              <div className="flex gap-x-2">
                 <input
                   type="email"
                   placeholder="Enter your email address"
