@@ -1,12 +1,17 @@
+import Footer from './Footer';
+
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
-    <main className="min-h-screen bg-white">
-      {children}
-    </main>
+    <div className="min-h-screen bg-white flex flex-col">
+      <main className="flex-grow">
+        {children}
+      </main>
+      <Footer />
+    </div>
   );
 };
 
