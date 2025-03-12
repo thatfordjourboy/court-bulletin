@@ -1,5 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { fadeInUp, stagger } from '../../utils/animations';
 
 const FeaturesSection = () => {
   const features = [
@@ -9,7 +13,7 @@ const FeaturesSection = () => {
       image: '/images/ghana.png',
       link: '/cause-lists',
       linkText: 'View Cause Lists →',
-      buttonClassName: 'px-4 py-2 bg-red-100 text-gray-700 font-medium inline-block rounded hover:bg-red-200 transition-colors w-auto'
+      buttonClassName: 'px-4 py-2 bg-red-100 text-gray-700 font-medium inline-block rounded hover:bg-red-200 transition-all duration-300 hover:scale-105'
     },
     {
       title: 'Notices',
@@ -17,7 +21,7 @@ const FeaturesSection = () => {
       image: '/images/notice.jpeg',
       link: '/notices',
       linkText: 'Browse Notices →',
-      buttonClassName: 'px-4 py-2 bg-blue-100 text-gray-700 font-medium inline-block rounded hover:bg-blue-200 transition-colors w-auto'
+      buttonClassName: 'px-4 py-2 bg-blue-100 text-gray-700 font-medium inline-block rounded hover:bg-blue-200 transition-all duration-300 hover:scale-105'
     },
     {
       title: 'Archives',
@@ -25,39 +29,71 @@ const FeaturesSection = () => {
       image: '/images/archive.jpeg',
       link: '/archives',
       linkText: 'Explore Archives →',
-      buttonClassName: 'px-4 py-2 bg-amber-100 text-gray-700 font-medium inline-block rounded hover:bg-amber-200 transition-colors w-auto'
+      buttonClassName: 'px-4 py-2 bg-amber-100 text-gray-700 font-medium inline-block rounded hover:bg-amber-200 transition-all duration-300 hover:scale-105'
     }
   ];
 
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          variants={stagger}
+          initial="initial"
+          animate="animate"
+          viewport={{ once: true }}
+        >
           {features.map((feature, index) => (
-            <div key={index} className="flex flex-col bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-              <div className="mb-6 relative h-64 overflow-hidden rounded-lg">
+            <motion.div 
+              key={index} 
+              className="flex flex-col bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300"
+              variants={fadeInUp}
+            >
+              <motion.div 
+                className="mb-6 relative h-64 overflow-hidden rounded-lg"
+                whileHover={{ scale: 1.03 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Image
                   src={feature.image}
                   alt={feature.title}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300"
                   priority={index === 0}
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-              </div>
-              <h3 className="text-2xl font-bold text-[#01292D] mb-3">{feature.title}</h3>
-              <p className="text-[#464646] mb-6 flex-grow">{feature.description}</p>
-              <div>
+              </motion.div>
+              <motion.h3 
+                className="text-2xl font-bold text-[#01292D] mb-3"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 * index }}
+              >
+                {feature.title}
+              </motion.h3>
+              <motion.p 
+                className="text-[#464646] mb-6 flex-grow"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 * index }}
+              >
+                {feature.description}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 * index }}
+              >
                 <Link 
                   href={feature.link}
                   className={feature.buttonClassName}
                 >
                   {feature.linkText}
                 </Link>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
