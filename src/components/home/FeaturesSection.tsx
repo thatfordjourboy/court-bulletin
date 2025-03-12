@@ -8,24 +8,24 @@ const FeaturesSection = () => {
       description: 'Quickly access schedules and details for all ongoing and upcoming court proceedings in Ghana.',
       image: '/images/ghana.png',
       link: '/cause-lists',
-      linkText: 'View Cause Lists',
-      buttonClassName: 'px-4 py-2 bg-red-100 text-gray-700 font-medium inline-flex items-center rounded hover:bg-red-200 transition-colors'
+      linkText: 'View Cause Lists →',
+      buttonClassName: 'px-4 py-2 bg-red-100 text-gray-700 font-medium inline-block rounded hover:bg-red-200 transition-colors w-auto'
     },
     {
       title: 'Notices',
       description: 'Stay ahead with official updates, policy changes, and judicial announcements straight from the courts.',
       image: '/images/notice.jpeg',
       link: '/notices',
-      linkText: 'Browse Notices',
-      buttonClassName: 'px-4 py-2 bg-blue-100 text-gray-700 font-medium inline-flex items-center rounded hover:bg-blue-200 transition-colors'
+      linkText: 'Browse Notices →',
+      buttonClassName: 'px-4 py-2 bg-blue-100 text-gray-700 font-medium inline-block rounded hover:bg-blue-200 transition-colors w-auto'
     },
     {
       title: 'Archives',
       description: 'Dive into a well-organized archive of past legal bulletins, case outcomes, old Gazettes, and more.',
       image: '/images/archive.jpeg',
       link: '/archives',
-      linkText: 'Explore Archives',
-      buttonClassName: 'px-4 py-2 bg-amber-100 text-gray-700 font-medium inline-flex items-center rounded hover:bg-amber-200 transition-colors'
+      linkText: 'Explore Archives →',
+      buttonClassName: 'px-4 py-2 bg-amber-100 text-gray-700 font-medium inline-block rounded hover:bg-amber-200 transition-colors w-auto'
     }
   ];
 
@@ -47,26 +47,14 @@ const FeaturesSection = () => {
               </div>
               <h3 className="text-2xl font-bold text-[#01292D] mb-3">{feature.title}</h3>
               <p className="text-[#464646] mb-6 flex-grow">{feature.description}</p>
-              <Link 
-                href={feature.link}
-                className={feature.buttonClassName}
-              >
-                {feature.linkText}
-                <svg 
-                  className="w-4 h-4 ml-2" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
+              <div>
+                <Link 
+                  href={feature.link}
+                  className={feature.buttonClassName}
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M14 5l7 7m0 0l-7 7m7-7H3" 
-                  />
-                </svg>
-              </Link>
+                  {feature.linkText}
+                </Link>
+              </div>
             </div>
           ))}
         </div>
