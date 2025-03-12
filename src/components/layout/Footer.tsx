@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="bg-[#01292D] text-white">
       <div className="max-w-[1440px] mx-auto">
         <div className="px-16 lg:px-24 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-6 gap-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-x-4 gap-y-8">
             {/* GH Court Bulletin Section */}
             <div className="lg:col-span-2 space-y-2">
               <h3 className="text-sm font-semibold text-[#F3F5F8] whitespace-nowrap">GH Court Bulletin</h3>
