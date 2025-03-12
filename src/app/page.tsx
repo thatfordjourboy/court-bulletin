@@ -20,11 +20,18 @@ export default function Home() {
       <LatestBulletinSection />
       <GazettesSection />
       <AdvertiseSection />
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <LegalResearchAd />
+      <div className="relative">
+        <div className="absolute -top-6 right-4 sm:right-8 lg:right-30">
+          <div className="bg-[#FFF3D9] text-[#01292D] px-3 py-1 text-sm font-medium rounded-md shadow-sm">
+            Ad
+          </div>
         </div>
-      </section>
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <LegalResearchAd />
+          </div>
+        </section>
+      </div>
     </MainLayout>
   );
 }
