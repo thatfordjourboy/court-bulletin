@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import useTypewriter from '../../hooks/useTypewriter';
 import { fadeInUp, fadeIn, slideIn } from '../../utils/animations';
+import SearchBar from './SearchBar';
 
 const HeroSection = () => {
   const words = [

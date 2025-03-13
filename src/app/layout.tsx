@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className="antialiased">
-        <MainLayout>
+        <MainLayout variant="default">
           {children}
         </MainLayout>
       </body>
