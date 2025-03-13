@@ -4,11 +4,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import SearchBar from './SearchBar';
+import { usePathname, useRouter } from 'next/navigation';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const linkStyles = "text-[#01292D] hover:text-[#71CED1] transition-all duration-300 hover:scale-105";
+  const isActivePath = (path: string) => {
+    return pathname?.startsWith(path);
+  };
+
+  const handleLogoClick = () => {
+    router.push('/');
+  };
+
+  const linkStyles = "text-[#464646] hover:text-[#01292D] transition-all duration-300 hover:scale-105";
+  const activeLinkStyles = "text-[#01292D] font-bold";
   const buttonStyles = "px-6 py-2 transition-all duration-300 hover:scale-105";
 
   return (
@@ -17,7 +29,10 @@ const Header = () => {
         {/* Top Row: Logo + Search */}
         <div className="flex items-center justify-between mb-6">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0 transition-transform duration-300 hover:scale-105">
+          <button 
+            onClick={handleLogoClick}
+            className="flex-shrink-0 transition-transform duration-300 hover:scale-105 focus:outline-none"
+          >
             <Image
               src="/images/ghana-court-bulletin-combined.svg"
               alt="Ghana Court Bulletin"
@@ -26,7 +41,7 @@ const Header = () => {
               priority
               className="object-contain"
             />
-          </Link>
+          </button>
 
           {/* Search Bar */}
           <div className="hidden lg:block relative w-[280px]">
@@ -70,22 +85,40 @@ const Header = () => {
             {/* Navigation Menu */}
             <div className="flex-1">
               <nav className="flex items-center justify-end gap-8 mr-8">
-                <Link href="/gazettes" className={linkStyles}>
+                <Link 
+                  href="/gazettes" 
+                  className={`${linkStyles} ${isActivePath('/gazettes') ? activeLinkStyles : ''}`}
+                >
                   Gazettes
                 </Link>
-                <Link href="/bulletin" className={linkStyles}>
+                <Link 
+                  href="/bulletin" 
+                  className={`${linkStyles} ${isActivePath('/bulletin') ? activeLinkStyles : ''}`}
+                >
                   Bulletin
                 </Link>
-                <Link href="/cause-lists" className={linkStyles}>
+                <Link 
+                  href="/cause-lists" 
+                  className={`${linkStyles} ${isActivePath('/cause-lists') ? activeLinkStyles : ''}`}
+                >
                   Cause Lists
                 </Link>
-                <Link href="/notices" className={linkStyles}>
+                <Link 
+                  href="/notices" 
+                  className={`${linkStyles} ${isActivePath('/notices') ? activeLinkStyles : ''}`}
+                >
                   Notices
                 </Link>
-                <Link href="/archives" className={linkStyles}>
+                <Link 
+                  href="/archives" 
+                  className={`${linkStyles} ${isActivePath('/archives') ? activeLinkStyles : ''}`}
+                >
                   Archives
                 </Link>
-                <Link href="/statistics" className={linkStyles}>
+                <Link 
+                  href="/statistics" 
+                  className={`${linkStyles} ${isActivePath('/statistics') ? activeLinkStyles : ''}`}
+                >
                   Court Statistics
                 </Link>
               </nav>
@@ -95,14 +128,18 @@ const Header = () => {
             <div className="flex items-center gap-4">
               <Link 
                 href="/contact" 
-                className={`${buttonStyles} border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white`}
+                className={`${buttonStyles} border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white ${
+                  isActivePath('/contact') ? 'bg-[#01292D] text-white' : ''
+                }`}
               >
                 Contact us
               </Link>
               
               <Link 
                 href="/signup" 
-                className={`${buttonStyles} bg-[#01292D] text-white hover:bg-[#71CED1]`}
+                className={`${buttonStyles} bg-[#01292D] text-white hover:bg-[#71CED1] ${
+                  isActivePath('/signup') ? 'bg-[#71CED1]' : ''
+                }`}
               >
                 Sign up
               </Link>
@@ -128,22 +165,40 @@ const Header = () => {
 
               {/* Mobile Navigation */}
               <nav className="flex flex-col space-y-4">
-                <Link href="/gazettes" className={`${linkStyles} px-2`}>
+                <Link 
+                  href="/gazettes" 
+                  className={`${linkStyles} px-2 ${isActivePath('/gazettes') ? activeLinkStyles : ''}`}
+                >
                   Gazettes
                 </Link>
-                <Link href="/bulletin" className={`${linkStyles} px-2`}>
+                <Link 
+                  href="/bulletin" 
+                  className={`${linkStyles} px-2 ${isActivePath('/bulletin') ? activeLinkStyles : ''}`}
+                >
                   Bulletin
                 </Link>
-                <Link href="/cause-lists" className={`${linkStyles} px-2`}>
+                <Link 
+                  href="/cause-lists" 
+                  className={`${linkStyles} px-2 ${isActivePath('/cause-lists') ? activeLinkStyles : ''}`}
+                >
                   Cause Lists
                 </Link>
-                <Link href="/notices" className={`${linkStyles} px-2`}>
+                <Link 
+                  href="/notices" 
+                  className={`${linkStyles} px-2 ${isActivePath('/notices') ? activeLinkStyles : ''}`}
+                >
                   Notices
                 </Link>
-                <Link href="/archives" className={`${linkStyles} px-2`}>
+                <Link 
+                  href="/archives" 
+                  className={`${linkStyles} px-2 ${isActivePath('/archives') ? activeLinkStyles : ''}`}
+                >
                   Archives
                 </Link>
-                <Link href="/statistics" className={`${linkStyles} px-2`}>
+                <Link 
+                  href="/statistics" 
+                  className={`${linkStyles} px-2 ${isActivePath('/statistics') ? activeLinkStyles : ''}`}
+                >
                   Court Statistics
                 </Link>
               </nav>
@@ -152,14 +207,18 @@ const Header = () => {
               <div className="flex flex-col space-y-4 pt-4">
                 <Link 
                   href="/contact" 
-                  className={`${buttonStyles} w-full border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white text-center`}
+                  className={`${buttonStyles} w-full border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white text-center ${
+                    isActivePath('/contact') ? 'bg-[#01292D] text-white' : ''
+                  }`}
                 >
                   Contact us
                 </Link>
                 
                 <Link 
                   href="/signup" 
-                  className={`${buttonStyles} w-full bg-[#01292D] text-white hover:bg-[#71CED1] text-center`}
+                  className={`${buttonStyles} w-full bg-[#01292D] text-white hover:bg-[#71CED1] text-center ${
+                    isActivePath('/signup') ? 'bg-[#71CED1]' : ''
+                  }`}
                 >
                   Sign up
                 </Link>
