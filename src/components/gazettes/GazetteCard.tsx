@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface MonthData {
   [key: string]: number;
@@ -101,66 +102,68 @@ const GazetteCard = ({
   onMonthClick 
 }: GazetteCardProps) => {
   return (
-    <motion.div 
-      className={`border border-gray-200 rounded-lg p-6 transition-all duration-300
-        ${isRecent ? 'shadow-md hover:shadow-xl' : 'hover:shadow-lg'}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="flex justify-between items-center mb-6">
-        <motion.h3 
-          className={`text-4xl font-bold ${isRecent ? 'text-[#01292D]' : 'text-[#64CCC5]'}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {year}
-        </motion.h3>
-        <motion.span 
-          className={`text-white text-sm px-3 py-1 rounded
-            ${isRecent ? 'bg-[#64CCC5]' : 'bg-[#01292D]'}`}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          {count} gazette{count !== 1 ? 's' : ''}
-        </motion.span>
-      </div>
-      
+    <Link href={`/gazettes/${year}`} className="block">
       <motion.div 
-        className="grid grid-cols-2 gap-6"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        className={`border border-gray-200 rounded-lg p-6 transition-all duration-300 cursor-pointer
+          ${isRecent ? 'shadow-md hover:shadow-xl' : 'hover:shadow-lg'}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -5 }}
+        transition={{ duration: 0.2 }}
       >
-        <Quarter 
-          label="Q1" 
-          months={quarters.q1.months} 
-          monthLabels={['J', 'F', 'M']}
-          onBarClick={(month, count) => onMonthClick?.(year, month, count)}
-        />
-        <Quarter 
-          label="Q2" 
-          months={quarters.q2.months} 
-          monthLabels={['A', 'M', 'J']}
-          onBarClick={(month, count) => onMonthClick?.(year, month, count)}
-        />
-        <Quarter 
-          label="Q3" 
-          months={quarters.q3.months} 
-          monthLabels={['J', 'A', 'S']}
-          onBarClick={(month, count) => onMonthClick?.(year, month, count)}
-        />
-        <Quarter 
-          label="Q4" 
-          months={quarters.q4.months} 
-          monthLabels={['O', 'N', 'D']}
-          onBarClick={(month, count) => onMonthClick?.(year, month, count)}
-        />
+        <div className="flex justify-between items-center mb-6">
+          <motion.h3 
+            className={`text-4xl font-bold ${isRecent ? 'text-[#01292D]' : 'text-[#64CCC5]'}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {year}
+          </motion.h3>
+          <motion.span 
+            className={`text-white text-sm px-3 py-1 rounded
+              ${isRecent ? 'bg-[#64CCC5]' : 'bg-[#01292D]'}`}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            {count} gazette{count !== 1 ? 's' : ''}
+          </motion.span>
+        </div>
+        
+        <motion.div 
+          className="grid grid-cols-2 gap-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Quarter 
+            label="Q1" 
+            months={quarters.q1.months} 
+            monthLabels={['J', 'F', 'M']}
+            onBarClick={(month, count) => onMonthClick?.(year, month, count)}
+          />
+          <Quarter 
+            label="Q2" 
+            months={quarters.q2.months} 
+            monthLabels={['A', 'M', 'J']}
+            onBarClick={(month, count) => onMonthClick?.(year, month, count)}
+          />
+          <Quarter 
+            label="Q3" 
+            months={quarters.q3.months} 
+            monthLabels={['J', 'A', 'S']}
+            onBarClick={(month, count) => onMonthClick?.(year, month, count)}
+          />
+          <Quarter 
+            label="Q4" 
+            months={quarters.q4.months} 
+            monthLabels={['O', 'N', 'D']}
+            onBarClick={(month, count) => onMonthClick?.(year, month, count)}
+          />
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </Link>
   );
 };
 
