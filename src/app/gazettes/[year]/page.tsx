@@ -285,11 +285,12 @@ export default function GazetteYearPage({ params }: PageParams) {
                     {group.month}
                   </div>
                   {group.gazettes.map((gazette) => {
-                    const formattedDate = gazette.date.replace(/-/g, '/');
+                    // Format date for URL: YYYY-MM-DD
+                    const formattedDateForUrl = gazette.date;
                     
                     return (
                       <Link 
-                        href={`/gazettes/${year}/${formattedDate}`}
+                        href={`/gazettes/${year}/${formattedDateForUrl}`}
                         key={gazette.title}
                       >
                         <div className="grid grid-cols-12 border-b hover:bg-gray-50 cursor-pointer">
