@@ -1,3 +1,4 @@
+import MainLayout from '@/components/layout/MainLayout';
 import HeroSection from '../components/layout/HeroSection';
 import ServiceNoticesSection from '../components/home/ServiceNoticesSection';
 import FeaturesSection from '../components/home/FeaturesSection';
@@ -10,7 +11,7 @@ import LegalResearchAd from '../components/ads/LegalResearchAd';
 
 export default function Home() {
   return (
-    <>
+    <MainLayout variant="default">
       <HeroSection />
       <ServiceNoticesSection />
       <FeaturesSection />
@@ -31,6 +32,6 @@ export default function Home() {
           </div>
         </section>
       </div>
-    </>
+    </MainLayout>
   );
 }

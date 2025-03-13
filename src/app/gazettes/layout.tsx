@@ -1,16 +1,9 @@
-import GazettesHeader from '@/components/gazettes/GazettesHeader';
+import GazetteLayout from '@/components/gazettes/GazetteLayout';
 
 export default function GazettesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <GazettesHeader />
-      <div className="flex-grow">
-        {children}
-      </div>
-    </>
-  );
+  return <GazetteLayout>{children}</GazetteLayout>;
 } 
