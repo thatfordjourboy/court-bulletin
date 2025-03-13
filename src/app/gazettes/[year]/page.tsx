@@ -40,42 +40,42 @@ export default function GazetteYearPage({ params }: PageParams) {
   // Mock data - will come from backend
   const mockGazettes: MonthGroup[] = [
     {
-      month: 'January 2023',
+      month: `January ${year}`,
       gazettes: [
-        { title: 'Gazette 6 January 2023', volume: 1, page: 2483, date: '2023-01-06' },
-        { title: 'Gazette 9 January 2023', volume: 1, page: 2483, date: '2023-01-09' },
-        { title: 'Gazette 14 January 2023', volume: 4, page: 2483, date: '2023-01-14' },
-        { title: 'Gazette 17 January 2023', volume: 3, page: 2483, date: '2023-01-17' },
-        { title: 'Gazette 23 January 2023', volume: 2, page: 2483, date: '2023-01-23' },
-        { title: 'Gazette 30 January 2023', volume: 1, page: 2483, date: '2023-01-30' }
+        { title: `Gazette 6 January ${year}`, volume: 1, page: 2483, date: `${year}-01-06` },
+        { title: `Gazette 9 January ${year}`, volume: 1, page: 2483, date: `${year}-01-09` },
+        { title: `Gazette 14 January ${year}`, volume: 4, page: 2483, date: `${year}-01-14` },
+        { title: `Gazette 17 January ${year}`, volume: 3, page: 2483, date: `${year}-01-17` },
+        { title: `Gazette 23 January ${year}`, volume: 2, page: 2483, date: `${year}-01-23` },
+        { title: `Gazette 30 January ${year}`, volume: 1, page: 2483, date: `${year}-01-30` }
       ]
     },
     {
-      month: 'February 2023',
+      month: `February ${year}`,
       gazettes: [
-        { title: 'Gazette 3 February 2023', volume: 1, page: 2484, date: '2023-02-03' },
-        { title: 'Gazette 10 February 2023', volume: 2, page: 2484, date: '2023-02-10' },
-        { title: 'Gazette 17 February 2023', volume: 1, page: 2484, date: '2023-02-17' },
-        { title: 'Gazette 24 February 2023', volume: 3, page: 2484, date: '2023-02-24' }
+        { title: `Gazette 3 February ${year}`, volume: 1, page: 2484, date: `${year}-02-03` },
+        { title: `Gazette 10 February ${year}`, volume: 2, page: 2484, date: `${year}-02-10` },
+        { title: `Gazette 17 February ${year}`, volume: 1, page: 2484, date: `${year}-02-17` },
+        { title: `Gazette 24 February ${year}`, volume: 3, page: 2484, date: `${year}-02-24` }
       ]
     },
     {
-      month: 'March 2023',
+      month: `March ${year}`,
       gazettes: [
-        { title: 'Gazette 3 March 2023', volume: 1, page: 2485, date: '2023-03-03' },
-        { title: 'Gazette 10 March 2023', volume: 2, page: 2485, date: '2023-03-10' },
-        { title: 'Gazette 17 March 2023', volume: 3, page: 2485, date: '2023-03-17' },
-        { title: 'Gazette 24 March 2023', volume: 1, page: 2485, date: '2023-03-24' },
-        { title: 'Gazette 31 March 2023', volume: 2, page: 2485, date: '2023-03-31' }
+        { title: `Gazette 3 March ${year}`, volume: 1, page: 2485, date: `${year}-03-03` },
+        { title: `Gazette 10 March ${year}`, volume: 2, page: 2485, date: `${year}-03-10` },
+        { title: `Gazette 17 March ${year}`, volume: 3, page: 2485, date: `${year}-03-17` },
+        { title: `Gazette 24 March ${year}`, volume: 1, page: 2485, date: `${year}-03-24` },
+        { title: `Gazette 31 March ${year}`, volume: 2, page: 2485, date: `${year}-03-31` }
       ]
     },
     {
-      month: 'April 2023',
+      month: `April ${year}`,
       gazettes: [
-        { title: 'Gazette 7 April 2023', volume: 1, page: 2486, date: '2023-04-07' },
-        { title: 'Gazette 14 April 2023', volume: 2, page: 2486, date: '2023-04-14' },
-        { title: 'Gazette 21 April 2023', volume: 1, page: 2486, date: '2023-04-21' },
-        { title: 'Gazette 28 April 2023', volume: 3, page: 2486, date: '2023-04-28' }
+        { title: `Gazette 7 April ${year}`, volume: 1, page: 2486, date: `${year}-04-07` },
+        { title: `Gazette 14 April ${year}`, volume: 2, page: 2486, date: `${year}-04-14` },
+        { title: `Gazette 21 April ${year}`, volume: 1, page: 2486, date: `${year}-04-21` },
+        { title: `Gazette 28 April ${year}`, volume: 3, page: 2486, date: `${year}-04-28` }
       ]
     }
   ];

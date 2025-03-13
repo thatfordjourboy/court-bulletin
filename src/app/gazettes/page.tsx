@@ -9,7 +9,12 @@ import Pagination from '@/components/gazettes/Pagination';
 import GazetteCard from '@/components/gazettes/GazetteCard';
 import { gazetteYears, type GazetteYear } from '@/data/mockGazettes';
 
-const ITEMS_PER_PAGE = 8;
+// Temporary log to check data
+console.log('Total gazette years:', gazetteYears.length);
+console.log('First year:', gazetteYears[0].year);
+console.log('Last year:', gazetteYears[gazetteYears.length - 1].year);
+
+const ITEMS_PER_PAGE = 9;
 
 const GazettesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Ghana Court Bulletin",
-  description: "Access comprehensive information about Ghana's court system and legal proceedings",
+  description: "Your trusted source for legal updates in Ghana",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="light">
-      <body className="antialiased">
+      <body className="antialiased font-['Inter']">
         {children}
       </body>
     </html>
