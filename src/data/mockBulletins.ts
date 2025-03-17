@@ -3,6 +3,7 @@ export interface BulletinDocument {
   title: string;
   date: string;
   documentType: string;
+  volume: string;
   totalPages: number;
   pages: Array<{
     pageNumber: number;
@@ -15,6 +16,7 @@ export const mockBulletins: BulletinDocument[] = Array.from({ length: 24 }, (_, 
   title: `Ghana Court Bulletin, Vol. ${i + 1}`,
   date: new Date(2024, 0, (i + 1) * 7).toISOString(),
   documentType: 'PDF',
+  volume: String(i + 1),
   totalPages: Math.floor(Math.random() * 8) + 5, // Random number of pages between 5 and 12
   pages: Array.from({ length: Math.floor(Math.random() * 8) + 5 }, (_, j) => ({
     pageNumber: j + 1,

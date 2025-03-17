@@ -7,14 +7,23 @@ import BulletinFilters from '@/components/bulletin/BulletinFilters';
 import Link from 'next/link';
 import { mockBulletins } from '@/data/mockBulletins';
 
+type BulletinDocument = {
+  id: string;
+  title: string;
+  date: string;
+  documentType: string;
+  volume: string;
+};
+
 const ITEMS_PER_PAGE = 8; // 4 items per row, 2 rows
 
 export default function BulletinPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredBulletins, setFilteredBulletins] = useState(mockBulletins);
+  const [filteredBulletins, setFilteredBulletins] = useState<BulletinDocument[]>(mockBulletins);
   const [selectedDate, setSelectedDate] = useState('');
   const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'oldest'>('relevance');
+  const [isExplicitSearch, setIsExplicitSearch] = useState(false);
 
   // Clean text for search
   const cleanText = (text: string) => {
@@ -68,6 +77,16 @@ export default function BulletinPage() {
         // Search in document type
         const typeMatch = containsAllTerms(bulletin.documentType, searchTerms);
         
+        // For explicit search, prioritize exact matches
+        if (isExplicitSearch) {
+          const searchVolNumber = extractVolumeNumber(searchQuery);
+          if (searchVolNumber !== null) {
+            const bulletinVolNumber = extractVolumeNumber(bulletin.title);
+            return bulletinVolNumber === searchVolNumber;
+          }
+          return bulletin.title.toLowerCase().includes(searchQuery.toLowerCase());
+        }
+        
         return titleMatch || dateMatch || typeMatch;
       });
 
@@ -106,7 +125,7 @@ export default function BulletinPage() {
 
     setFilteredBulletins(filtered);
     setCurrentPage(1);
-  }, [searchQuery, selectedDate, sortBy]);
+  }, [searchQuery, selectedDate, sortBy, isExplicitSearch]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredBulletins.length / ITEMS_PER_PAGE);
@@ -116,12 +135,14 @@ export default function BulletinPage() {
   // Format date to display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    const formattedDate = date.toLocaleDateString('en-US', {
       weekday: 'long',
-      day: 'numeric',
+      year: 'numeric',
       month: 'long',
-      year: 'numeric'
+      day: 'numeric'
     });
+    // Remove any ordinal indicators (st, nd, rd, th)
+    return formattedDate.replace(/(\d+)(st|nd|rd|th)/, '$1');
   };
 
   // Reset all filters
@@ -133,8 +154,8 @@ export default function BulletinPage() {
 
   return (
     <main className="min-h-screen py-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-6">
+      <div className="container mx-auto px-1 sm:px-6 lg:px-8">
+        <div className="flex gap-32">
           {/* Sidebar */}
           <div className="w-[240px] shrink-0">
             <BulletinFilters
@@ -154,10 +175,15 @@ export default function BulletinPage() {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsExplicitSearch(false);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
+                      setIsExplicitSearch(true);
+                      setTimeout(() => setIsExplicitSearch(false), 100);
                       const button = document.querySelector('#searchButton');
                       if (button instanceof HTMLElement) {
                         button.style.transform = 'scale(0.95)';
@@ -174,6 +200,8 @@ export default function BulletinPage() {
                   id="searchButton"
                   className="absolute right-0 top-0 h-full w-[46px] bg-[#01292D] text-white flex items-center justify-center transition-transform duration-100"
                   onClick={() => {
+                    setIsExplicitSearch(true);
+                    setTimeout(() => setIsExplicitSearch(false), 100);
                     const button = document.querySelector('#searchButton');
                     if (button instanceof HTMLElement) {
                       button.style.transform = 'scale(0.95)';
@@ -200,50 +228,52 @@ export default function BulletinPage() {
               </div>
               
               {/* Results count */}
-              <div className="text-[#71CED1] mt-4">
+              <div className="text-[#64CCC5] text-sm font-medium mt-3 mb-6">
                 {filteredBulletins.length} results
               </div>
             </div>
 
             {/* Bulletins grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-1 gap-y-12 mb-12">
               {paginatedBulletins.map((bulletin) => (
-                <div 
-                  key={bulletin.id}
-                  className="bg-[#F9FAFB] p-6 rounded-sm"
-                >
-                  <h2 className="text-[#01292D] text-xl font-bold mb-6">
-                    {bulletin.title}
-                  </h2>
-                  
-                  <div className="flex flex-col gap-4 mb-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[#464646]">Date</span>
-                      <span className="text-[#464646]">{formatDate(bulletin.date)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[#464646]">Document type</span>
-                      <span className="text-[#464646]">{bulletin.documentType}</span>
+                <div key={bulletin.id} className="flex flex-col">
+                  <div className="bg-[#F9FAFB] mb-2 w-fit">
+                    <h2 className="text-[#01292D] text-2xl font-semibold mb-4 px-4 pt-4">
+                      Ghana Court Bulletin, Vol. {bulletin.volume}
+                    </h2>
+                    
+                    <div className="grid grid-cols-2 gap-x-4 px-4 pb-4">
+                      <div>
+                        <div className="font-medium text-sm text-[#1E1D1D] mb-2">Date</div>
+                        <div className="text-sm text-[#464646]">{formatDate(bulletin.date)}</div>
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm text-[#1E1D1D] mb-2">Document type</div>
+                        <div className="text-sm text-[#464646]">{bulletin.documentType}</div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-6">
+                  <div className="flex items-center gap-2">
                     <Link 
                       href={`/bulletin/${bulletin.id}/read`}
-                      className="flex items-center gap-2 px-6 py-2.5 border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white transition-colors"
+                      className="h-9 flex items-center px-3 border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white transition-colors text-sm font-semibold"
                     >
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1.66699 2.5H6.66699C7.55105 2.5 8.39889 2.85119 9.02401 3.47631C9.64914 4.10143 10.0003 4.94928 10.0003 5.83333V17.5C10.0003 16.837 9.73694 16.2011 9.26809 15.7322C8.79925 15.2634 8.16337 15 7.50033 15H1.66699V2.5Z" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M18.3337 2.5H13.3337C12.4496 2.5 11.6018 2.85119 10.9767 3.47631C10.3515 4.10143 10.0003 4.94928 10.0003 5.83333V17.5C10.0003 16.837 10.2637 16.2011 10.7325 15.7322C11.2014 15.2634 11.8373 15 12.5003 15H18.3337V2.5Z" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
                       Read online
-                    </Link>
-                    <button className="flex items-center gap-2 px-6 py-2.5 bg-[#01292D] text-[#8DFFDD] hover:bg-[#064e55] transition-colors">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.5 12.5V15.8333C17.5 16.2754 17.3244 16.6993 17.0118 17.0118C16.6993 17.3244 16.2754 17.5 15.8333 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V12.5M5.83333 8.33333L10 12.5M10 12.5L14.1667 8.33333M10 12.5V2.5" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg className="ml-1" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 2.66667H6C6.70724 2.66667 7.38552 2.94762 7.88562 3.44772C8.38572 3.94781 8.66667 4.62609 8.66667 5.33334V14.6667C8.66667 14.1362 8.456 13.6275 8.08093 13.2525C7.70587 12.8774 7.19713 12.6667 6.66667 12.6667H2V2.66667Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M14 2.66667H10C9.29276 2.66667 8.61448 2.94762 8.11438 3.44772C7.61428 3.94781 7.33334 4.62609 7.33334 5.33334V14.6667C7.33334 14.1362 7.544 13.6275 7.91907 13.2525C8.29413 12.8774 8.80287 12.6667 9.33334 12.6667H14V2.66667Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
+                    </Link>
+                    <Link 
+                      href={`/bulletin/${bulletin.id}/download`}
+                      className="h-9 flex items-center px-3 bg-[#01292D] text-white hover:bg-[#064E55] transition-colors text-sm font-semibold"
+                    >
                       Download
-                    </button>
+                      <svg className="ml-1" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </Link>
                   </div>
                 </div>
               ))}
