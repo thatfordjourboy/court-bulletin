@@ -84,65 +84,70 @@ const YearCard = ({ data, index }: { data: GazetteYear; index: number }) => {
   const isRecentYear = index < 2; // First two years (2024 and 2023)
   
   return (
-    <motion.div 
-      className={`border border-gray-200 rounded-lg p-6 transition-all duration-300
-        ${isRecentYear ? 'shadow-md hover:shadow-xl' : 'hover:shadow-lg'}`}
-      variants={fadeInUp}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="flex justify-between items-center mb-6">
-        <motion.h3 
-          className={`text-4xl font-bold ${isRecentYear ? 'text-[#01292D]' : 'text-[#64CCC5]'}`}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {data.year}
-        </motion.h3>
-        <motion.span 
-          className={`text-white text-sm px-3 py-1
-            ${isRecentYear ? 'bg-[#64CCC5]' : 'bg-[#01292D]'}`}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          {data.count} gazettes
-        </motion.span>
-      </div>
-      
+    <Link href={`/gazettes/${data.year}`} className="block">
       <motion.div 
-        className="grid grid-cols-2 gap-6"
-        variants={stagger}
-        initial="initial"
-        animate="animate"
+        className={`border border-gray-200 rounded-lg p-6 transition-all duration-300 cursor-pointer
+          ${isRecentYear ? 'shadow-md hover:shadow-xl' : 'hover:shadow-lg'}`}
+        variants={fadeInUp}
+        whileHover={{ y: -5 }}
+        transition={{ duration: 0.2 }}
       >
-        <Quarter 
-          label="Q1" 
-          months={data.quarters.q1.months} 
-          monthLabels={['J', 'F', 'M']} 
-        />
-        <Quarter 
-          label="Q2" 
-          months={data.quarters.q2.months} 
-          monthLabels={['A', 'M', 'J']} 
-        />
-        <Quarter 
-          label="Q3" 
-          months={data.quarters.q3.months} 
-          monthLabels={['J', 'A', 'S']} 
-        />
-        <Quarter 
-          label="Q4" 
-          months={data.quarters.q4.months} 
-          monthLabels={['O', 'N', 'D']} 
-        />
+        <div className="flex justify-between items-center mb-6">
+          <motion.h3 
+            className={`text-4xl font-bold ${isRecentYear ? 'text-[#01292D]' : 'text-[#64CCC5]'}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {data.year}
+          </motion.h3>
+          <motion.span 
+            className={`text-white text-sm px-3 py-1
+              ${isRecentYear ? 'bg-[#64CCC5]' : 'bg-[#01292D]'}`}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+          >
+            {data.count} gazettes
+          </motion.span>
+        </div>
+        
+        <motion.div 
+          className="grid grid-cols-2 gap-6"
+          variants={stagger}
+          initial="initial"
+          animate="animate"
+        >
+          <Quarter 
+            label="Q1" 
+            months={data.quarters.q1.months} 
+            monthLabels={['J', 'F', 'M']} 
+          />
+          <Quarter 
+            label="Q2" 
+            months={data.quarters.q2.months} 
+            monthLabels={['A', 'M', 'J']} 
+          />
+          <Quarter 
+            label="Q3" 
+            months={data.quarters.q3.months} 
+            monthLabels={['J', 'A', 'S']} 
+          />
+          <Quarter 
+            label="Q4" 
+            months={data.quarters.q4.months} 
+            monthLabels={['O', 'N', 'D']} 
+          />
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </Link>
   );
 };
 
 const GazettesSection = () => {
+  // Get only the 4 most recent years
+  const recentGazettes = gazetteYears.slice(0, 4);
+
   return (
     <motion.section 
       className="py-16 bg-gray-50"
@@ -169,7 +174,7 @@ const GazettesSection = () => {
           whileInView="animate"
           viewport={{ once: true }}
         >
-          {gazetteYears.map((yearData, index) => (
+          {recentGazettes.map((yearData, index) => (
             <motion.div
               key={yearData.year}
               variants={fadeInUp}
@@ -191,7 +196,7 @@ const GazettesSection = () => {
             href="/gazettes" 
             className="bg-[#01292D] text-white px-6 py-3 inline-flex items-center group hover:bg-[#64CCC5] transition-colors duration-300"
           >
-            <span>Browse Gazettes</span>
+            <span>Browse All Gazettes</span>
             <motion.span 
               className="ml-2"
               animate={{ x: [0, 3, 0] }}

@@ -114,14 +114,14 @@ const Footer = () => {
             {/* Newsletter Section */}
             <div className="md:w-full lg:w-[300px] lg:ml-4 space-y-4">
               <h3 className="text-sm font-semibold text-[#F3F5F8]">Subscribe to our newsletter</h3>
-              <div className="bg-white p-2 flex items-center w-[276px] h-[42.81px]">
+              <div className="flex items-center w-full max-w-[276px] h-[42.81px] bg-white p-2">
                 <input
                   type="email"
                   placeholder="Enter your email address"
-                  className="flex-1 bg-transparent text-[#1E1D1D] placeholder:text-[#464646] placeholder:text-[8.34px] placeholder:font-medium placeholder:leading-[170%] placeholder:tracking-[-0.01em] placeholder:font-['Inter'] focus:placeholder-transparent focus:outline-none"
+                  className="flex-1 min-w-0 bg-transparent text-[#1E1D1D] placeholder:text-[#464646] placeholder:text-[8.34px] placeholder:font-medium placeholder:leading-[170%] placeholder:tracking-[-0.01em] placeholder:font-['Inter'] focus:placeholder-transparent focus:outline-none"
                 />
-                <button className="bg-[#01292D] w-[79.69px] h-[28.9px] px-[8.34px] py-[6.95px] text-[#F3F5F8] hover:bg-[#71CED1] transition-colors font-['Inter'] flex items-center justify-center">
-                  <span className="font-['Inter'] text-[12.51px] font-bold leading-[100%] tracking-[0%] text-[#FFFFFF] w-[63px] h-[15px] flex items-center justify-center">Subscribe</span>
+                <button className="flex-shrink-0 bg-[#01292D] w-[79.69px] h-[28.9px] px-[8.34px] py-[6.95px] text-[#F3F5F8] hover:bg-[#71CED1] transition-colors font-['Inter'] flex items-center justify-center">
+                  <span className="font-['Inter'] text-[12.51px] font-bold leading-[100%] tracking-[0%] text-[#FFFFFF] flex items-center justify-center">Subscribe</span>
                 </button>
               </div>
               

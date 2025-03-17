@@ -46,15 +46,15 @@ const HeroSection = () => {
               className="text-[#01292D] text-5xl font-bold leading-tight mb-6"
               variants={slideIn}
             >
-              Your <span className="relative">
+              Your <span className="relative inline-block">
                 <span 
-                  className="italic font-bold text-[48px] leading-[150%] tracking-[-1%] font-['Inter']"
+                  className="italic font-bold text-[48px] leading-[150%] tracking-[0] font-['Inter']"
                   style={gradientTextStyle}
                 >
                   trusted
                 </span>
                 <motion.span 
-                  className="absolute bottom-1 left-0 w-full h-1 bg-[#71CED1]"
+                  className="absolute bottom-0 left-0 w-full h-1 bg-[#71CED1]"
                   initial={{ width: 0 }}
                   animate={{ width: '100%' }}
                   transition={{ duration: 0.8, delay: 0.2 }}

@@ -29,8 +29,8 @@ const Header = () => {
         {/* Top Row: Logo + Search */}
         <div className="flex items-center justify-between mb-6">
           {/* Logo */}
-          <button 
-            onClick={handleLogoClick}
+          <Link 
+            href="/"
             className="flex-shrink-0 transition-transform duration-300 hover:scale-105 focus:outline-none"
           >
             <Image
@@ -41,7 +41,7 @@ const Header = () => {
               priority
               className="object-contain"
             />
-          </button>
+          </Link>
 
           {/* Search Bar */}
           <div className="hidden lg:block relative w-[280px]">
