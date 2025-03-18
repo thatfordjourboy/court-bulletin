@@ -13,8 +13,79 @@ export default function NoticesPage() {
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [noticeTypeFilter, setNoticeTypeFilter] = useState<string | null>(null);
   const [courtTypeFilter, setCourtTypeFilter] = useState<string | null>(null);
+  const [divisionFilter, setDivisionFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'oldest' | null>(null);
   const [filteredNotices, setFilteredNotices] = useState<Notice[]>(mockNotices);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(filteredNotices.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentNotices = filteredNotices.slice(startIndex, endIndex);
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 7;
+    const ellipsis = '...';
+
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total pages are less than max visible pages
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Always show first page
+      pageNumbers.push(1);
+
+      if (currentPage <= 3) {
+        // If current page is near the start
+        for (let i = 2; i <= 4; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push(ellipsis);
+        pageNumbers.push(totalPages - 1);
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        // If current page is near the end
+        pageNumbers.push(ellipsis);
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        // If current page is in the middle
+        pageNumbers.push(ellipsis);
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push(ellipsis);
+        pageNumbers.push(totalPages);
+      }
+    }
+
+    return pageNumbers;
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Handle previous page
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  // Handle next page
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
 
   // Filter and sort notices
   useEffect(() => {
@@ -49,6 +120,13 @@ export default function NoticesPage() {
       filtered = filtered.filter(notice => 
         notice.court === courtTypeFilter
       );
+
+      // Apply division filter only if High Court is selected
+      if (courtTypeFilter === 'High Court' && divisionFilter) {
+        filtered = filtered.filter(notice => 
+          notice.division === divisionFilter
+        );
+      }
     }
 
     // Apply sorting
@@ -62,10 +140,9 @@ export default function NoticesPage() {
     });
 
     setFilteredNotices(filtered);
-    
-    // Scroll to top when filters change
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [searchQuery, dateFilter, noticeTypeFilter, courtTypeFilter, sortBy]);
+    setCurrentPage(1); // Reset to first page when filters change
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Only scroll to top when filters change
+  }, [searchQuery, dateFilter, noticeTypeFilter, courtTypeFilter, divisionFilter, sortBy]);
 
   // Handle search
   const handleSearch = (e: React.FormEvent) => {
@@ -73,27 +150,11 @@ export default function NoticesPage() {
     // Search is handled by the useEffect above
   };
 
-  // Handle filter changes
-  const handleDateChange = (date: string | null) => {
-    setDateFilter(date);
-  };
-
-  const handleNoticeTypeChange = (type: string | null) => {
-    setNoticeTypeFilter(type);
-  };
-
-  const handleCourtTypeChange = (type: string | null) => {
-    setCourtTypeFilter(type);
-  };
-
-  const handleSortChange = (sort: 'relevance' | 'newest' | 'oldest' | null) => {
-    setSortBy(sort);
-  };
-
   const handleReset = () => {
     setDateFilter(null);
     setNoticeTypeFilter(null);
     setCourtTypeFilter(null);
+    setDivisionFilter(null);
     setSortBy(null);
     setSearchQuery('');
   };
@@ -127,14 +188,16 @@ export default function NoticesPage() {
           {/* Sidebar */}
           <div className="w-full lg:w-[250px] bg-[#F3F5F8] p-5 lg:sticky lg:top-6 h-fit order-2 lg:order-1">
             <NoticeFilters
-              onDateChange={handleDateChange}
-              onNoticeTypeChange={handleNoticeTypeChange}
-              onCourtTypeChange={handleCourtTypeChange}
-              onSortChange={handleSortChange}
+              onDateChange={setDateFilter}
+              onNoticeTypeChange={setNoticeTypeFilter}
+              onCourtTypeChange={setCourtTypeFilter}
+              onDivisionChange={setDivisionFilter}
+              onSortChange={setSortBy}
               onReset={handleReset}
               selectedDate={dateFilter}
               selectedNoticeType={noticeTypeFilter}
               selectedCourtType={courtTypeFilter}
+              selectedDivision={divisionFilter}
               selectedSort={sortBy}
             />
           </div>
@@ -177,12 +240,12 @@ export default function NoticesPage() {
 
             {/* Notices list */}
             <motion.div 
-              className="space-y-6"
+              className="space-y-10"
               variants={stagger}
               initial="initial"
               animate="animate"
             >
-              {filteredNotices.map((notice) => (
+              {currentNotices.map((notice) => (
                 <NoticeCard
                   key={notice.id}
                   type={notice.type}
@@ -198,8 +261,18 @@ export default function NoticesPage() {
             </motion.div>
 
             {/* Pagination */}
-            <div className="mt-12 flex items-center justify-between">
-              <button className="flex items-center text-[#0066CC] hover:underline">
+          </div>
+        </div>
+
+        {/* Pagination section - moved outside the grid */}
+        <div className="relative mt-12 border-t border-[#E5E7EB] -mr-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-24">
+            <div className="flex items-center justify-between py-6">
+              <button 
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                className={`flex items-center ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-[#0066CC] hover:underline'}`}
+              >
                 <svg 
                   className="w-5 h-5 mr-2" 
                   fill="none" 
@@ -216,17 +289,23 @@ export default function NoticesPage() {
                 Previous
               </button>
               <div className="flex items-center gap-2">
-                {[1, 2, 3, '...', 8, 9, 10].map((page, index) => (
+                {getPageNumbers().map((page, index) => (
                   <button
                     key={index}
+                    onClick={() => typeof page === 'number' ? handlePageChange(page) : null}
                     className={`w-8 h-8 flex items-center justify-center
-                      ${page === 1 ? 'bg-[#01292D] text-white' : 'text-[#464646] hover:bg-[#F3F5F8]'}`}
+                      ${page === currentPage ? 'bg-[#01292D] text-white' : 
+                        page === '...' ? 'cursor-default' : 'text-[#464646] hover:bg-[#F3F5F8]'}`}
                   >
                     {page}
                   </button>
                 ))}
               </div>
-              <button className="flex items-center text-[#0066CC] hover:underline">
+              <button 
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={`flex items-center ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-[#0066CC] hover:underline'}`}
+              >
                 Next
                 <svg 
                   className="w-5 h-5 ml-2" 
@@ -238,7 +317,7 @@ export default function NoticesPage() {
                     strokeLinecap="round" 
                     strokeLinejoin="round" 
                     strokeWidth={2} 
-                    d="M9 5l7 7-7 7" 
+                    d="M9 5l7 7-7 7"
                   />
                 </svg>
               </button>

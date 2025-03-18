@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,11 +9,13 @@ interface NoticeFiltersProps {
   onDateChange: (date: string | null) => void;
   onNoticeTypeChange: (type: string | null) => void;
   onCourtTypeChange: (type: string | null) => void;
+  onDivisionChange: (division: string | null) => void;
   onSortChange: (sort: 'relevance' | 'newest' | 'oldest' | null) => void;
   onReset: () => void;
   selectedDate: string | null;
   selectedNoticeType: string | null;
   selectedCourtType: string | null;
+  selectedDivision: string | null;
   selectedSort: 'relevance' | 'newest' | 'oldest' | null;
   isLoading?: boolean;
 }
@@ -33,6 +35,18 @@ const courtTypes = [
   'Circuit Court',
   'District Court',
   'Court of Appeal'
+];
+
+const highCourtDivisions = [
+  'Criminal Division',
+  'Land Court',
+  'Divorce and Matrimonial Division',
+  'Probate and Administration Division',
+  'Labour Division',
+  'Human Rights Division',
+  'Commercial Division',
+  'Financial Division',
+  'General Jurisdiction'
 ];
 
 const sortOptions = [
@@ -57,17 +71,34 @@ export default function NoticeFilters({
   onDateChange,
   onNoticeTypeChange,
   onCourtTypeChange,
+  onDivisionChange,
   onSortChange,
   onReset,
   selectedDate,
   selectedNoticeType,
   selectedCourtType,
+  selectedDivision,
   selectedSort,
   isLoading = false
 }: NoticeFiltersProps) {
   const [showYearPicker, setShowYearPicker] = useState(false);
   const [date, setDate] = useState<Date | null>(selectedDate ? new Date(selectedDate) : null);
   const [animatingButton, setAnimatingButton] = useState<string | null>(null);
+  const [showDivisions, setShowDivisions] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDivisions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleDateChange = (date: Date | null) => {
     setDate(date);
@@ -176,39 +207,82 @@ export default function NoticeFilters({
         <h3 className="text-[#1E1D1D] text-[16px] font-medium mb-3">Filter by court type</h3>
         <div className="flex flex-col gap-1.5">
           {courtTypes.map((type) => (
-            <motion.button
-              key={type}
-              variants={buttonVariants}
-              initial="initial"
-              whileHover="hover"
-              whileTap="tap"
-              onClick={() => onCourtTypeChange(selectedCourtType === type ? null : type)}
-              className={`relative w-full h-[34px] text-left px-2.5 flex items-center justify-between text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden ${
-                selectedCourtType === type ? 'border-l-[3px] border-l-[#64CCC5] bg-[#F9FAFB]' : ''
-              }`}
-            >
-              <span className="relative z-10">{type}</span>
-              {type === 'High Court' && (
-                <motion.svg 
-                  animate={{ rotate: selectedCourtType === type ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-4 h-4 text-[#464646] relative z-10" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </motion.svg>
-              )}
-              <motion.div
-                initial={false}
-                animate={{
-                  opacity: selectedCourtType === type ? 1 : 0
+            <div key={type} className="relative" ref={type === 'High Court' ? dropdownRef : undefined}>
+              <motion.button
+                variants={buttonVariants}
+                initial="initial"
+                whileHover="hover"
+                whileTap="tap"
+                onClick={() => {
+                  if (type === 'High Court') {
+                    setShowDivisions(!showDivisions);
+                  } else {
+                    setShowDivisions(false);
+                    if (selectedCourtType === type) {
+                      onCourtTypeChange(null);
+                      onDivisionChange(null);
+                    } else {
+                      onCourtTypeChange(type);
+                      onDivisionChange(null);
+                    }
+                  }
                 }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 bg-[#64CCC5] opacity-[0.03]"
-              />
-            </motion.button>
+                className={`relative w-full h-[34px] text-left px-2.5 flex items-center justify-between text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden ${
+                  selectedCourtType === type ? 'border-l-[3px] border-l-[#64CCC5] bg-[#F9FAFB]' : ''
+                }`}
+              >
+                <span className="relative z-10">{type}</span>
+                {type === 'High Court' && (
+                  <motion.svg 
+                    animate={{ rotate: showDivisions ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-4 h-4 text-[#464646] relative z-10" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </motion.svg>
+                )}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: selectedCourtType === type ? 1 : 0
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0 bg-[#64CCC5] opacity-[0.03]"
+                />
+              </motion.button>
+
+              {/* High Court Divisions Dropdown */}
+              <AnimatePresence>
+                {type === 'High Court' && showDivisions && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute z-50 left-0 w-[280px] top-[calc(100%+4px)] bg-white border border-[#E5E7EB] rounded-sm shadow-lg py-1"
+                  >
+                    {highCourtDivisions.map((division) => (
+                      <motion.button
+                        key={division}
+                        onClick={() => {
+                          onCourtTypeChange('High Court');
+                          onDivisionChange(selectedDivision === division ? null : division);
+                          setShowDivisions(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-2 text-[13px] whitespace-nowrap hover:bg-[#F9FAFB] transition-colors ${
+                          selectedDivision === division ? 'text-[#64CCC5] font-medium' : 'text-[#464646]'
+                        }`}
+                      >
+                        {division}
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ))}
         </div>
       </div>
