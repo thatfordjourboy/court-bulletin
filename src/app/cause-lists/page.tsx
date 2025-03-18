@@ -96,32 +96,18 @@ export default function CauseListsPage() {
                     if (e.key === 'Enter') {
                       e.preventDefault();
                       setIsExplicitSearch(true);
-                      setTimeout(() => setIsExplicitSearch(false), 100);
-                      const button = document.querySelector('#searchButton');
-                      if (button instanceof HTMLElement) {
-                        button.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                          button.style.transform = 'scale(1)';
-                        }, 100);
-                      }
+                      setCurrentPage(1); // Reset to first page on search
                     }
                   }}
                   className="w-full h-[46px] border border-[#E5E7EB] px-4 pr-[46px] py-2.5 bg-white"
-                  placeholder="Supreme court cause list"
+                  placeholder="Search cause lists..."
                 />
                 <button 
                   id="searchButton"
                   className="absolute right-0 top-0 h-full w-[46px] bg-[#01292D] text-white flex items-center justify-center transition-transform duration-100"
                   onClick={() => {
                     setIsExplicitSearch(true);
-                    setTimeout(() => setIsExplicitSearch(false), 100);
-                    const button = document.querySelector('#searchButton');
-                    if (button instanceof HTMLElement) {
-                      button.style.transform = 'scale(0.95)';
-                      setTimeout(() => {
-                        button.style.transform = 'scale(1)';
-                      }, 100);
-                    }
+                    setCurrentPage(1); // Reset to first page on search
                   }}
                 >
                   <svg 

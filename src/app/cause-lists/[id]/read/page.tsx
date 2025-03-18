@@ -123,7 +123,7 @@ export default function CauseListDetailPage({ params }: { params: { id: string }
         {/* Related Cause Lists Section */}
         {relatedLists.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-[#1E1D1D] text-2xl mb-8">Cause Lists of other courts</h2>
+            <h2 className="text-[#1E1D1D] text-[32px] font-bold mb-8">Cause Lists of other courts</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedLists.map((list) => (
                 <div 

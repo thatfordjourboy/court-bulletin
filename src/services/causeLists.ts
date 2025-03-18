@@ -185,6 +185,36 @@ export async function getRelatedCauseLists(currentId: string): Promise<CauseList
     return sameDateRange && (sameLocationDifferentCourt || sameCourtDifferentLocation);
   });
 
-  // Sort by priority and limit to 3 items
+  // If we don't have enough related lists with strict criteria, relax the date matching
+  if (relatedLists.length < 3) {
+    const additionalLists = mockCauseLists.filter(list => {
+      // Exclude current list and already included lists
+      if (list.id === currentId || relatedLists.some(r => r.id === list.id)) return false;
+
+      // Same location, different court type
+      const sameLocationDifferentCourt = 
+        list.location === currentList.location && 
+        list.courtType !== currentList.courtType;
+
+      // Same court type, different location
+      const sameCourtDifferentLocation = 
+        list.courtType === currentList.courtType && 
+        list.location !== currentList.location;
+
+      return sameLocationDifferentCourt || sameCourtDifferentLocation;
+    });
+
+    // Add additional lists until we have 3
+    relatedLists.push(...additionalLists.slice(0, 3 - relatedLists.length));
+  }
+
+  // If we still don't have enough, just add other court lists until we have 3
+  if (relatedLists.length < 3) {
+    const remainingLists = mockCauseLists.filter(list => 
+      list.id !== currentId && !relatedLists.some(r => r.id === list.id)
+    );
+    relatedLists.push(...remainingLists.slice(0, 3 - relatedLists.length));
+  }
+
   return relatedLists.slice(0, 3);
 } 

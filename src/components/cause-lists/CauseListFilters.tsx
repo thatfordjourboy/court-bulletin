@@ -1,4 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import { mockCauseLists } from '@/data/mockCauseLists';
 
 type Props = {
   onDateChange: (date: string) => void;
@@ -61,8 +64,31 @@ export default function CauseListFilters({
   selectedRegion
 }: Props) {
   const [showHighCourtDivisions, setShowHighCourtDivisions] = useState(false);
+  const [date, setDate] = useState<Date | null>(selectedDate ? new Date(selectedDate) : null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Create a Set of dates that have cause lists
+  const availableDates = new Set(
+    mockCauseLists.map(list => {
+      const [day, month, year] = list.date.split(' ');
+      return new Date(
+        parseInt(year),
+        new Date(Date.parse(month + " 1, " + year)).getMonth(),
+        parseInt(day)
+      ).toDateString();
+    })
+  );
+
+  // Function to determine if a date has cause lists
+  const hasDataForDate = (date: Date) => {
+    return availableDates.has(date.toDateString());
+  };
+
+  // Function to add custom class to dates with data
+  const highlightDatesWithData = (date: Date) => {
+    return hasDataForDate(date) ? 'has-cause-list' : '';
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -86,8 +112,72 @@ export default function CauseListFilters({
     }
   };
 
+  const handleDateChange = (date: Date | null) => {
+    setDate(date);
+    if (date) {
+      const formattedDate = date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      onDateChange(formattedDate);
+    } else {
+      onDateChange('');
+    }
+  };
+
   return (
     <div className="bg-[#F9FAFB] p-4 space-y-6 font-inter">
+      <style jsx global>{`
+        .has-cause-list {
+          position: relative;
+        }
+        .has-cause-list::after {
+          content: '';
+          position: absolute;
+          bottom: 2px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 4px;
+          height: 4px;
+          background-color: #64CCC5;
+          border-radius: 50%;
+        }
+        .react-datepicker__day--keyboard-selected,
+        .react-datepicker__day--selected {
+          background-color: #01292D !important;
+          color: white !important;
+          font-weight: 500 !important;
+        }
+        .react-datepicker__day:hover {
+          background-color: #E5E7EB !important;
+        }
+        .react-datepicker__day--keyboard-selected:hover,
+        .react-datepicker__day--selected:hover {
+          background-color: #064E55 !important;
+          color: white !important;
+        }
+        .react-datepicker__month-select,
+        .react-datepicker__year-select {
+          padding: 2px;
+          border-radius: 4px;
+          border: 1px solid #E5E7EB;
+          font-size: 14px;
+          color: #464646;
+          background-color: white;
+        }
+        .react-datepicker__month-select:focus,
+        .react-datepicker__year-select:focus {
+          outline: none;
+          border-color: #64CCC5;
+        }
+        .react-datepicker__month-select option,
+        .react-datepicker__year-select option {
+          font-size: 14px;
+          padding: 4px;
+        }
+      `}</style>
+
       <button 
         onClick={onReset}
         className="text-[#FF8B8B] text-sm font-medium hover:text-[#FF6B6B] transition-colors underline"
@@ -98,13 +188,20 @@ export default function CauseListFilters({
       {/* Filter by date */}
       <div className="space-y-3">
         <h2 className="text-[#1E1D1D] text-lg font-medium">Filter by date</h2>
-        <div className="relative bg-white rounded-sm">
-          <input
-            type="text"
-            value={selectedDate}
-            onChange={(e) => onDateChange(e.target.value)}
-            className="w-full h-11 px-4 border border-[#E5E7EB] bg-white text-[14px] leading-[100%] tracking-[0%] text-[#464646] rounded-sm"
-            placeholder="Date"
+        <div className="relative">
+          <DatePicker
+            selected={date}
+            onChange={handleDateChange}
+            dateFormat="dd MMMM yyyy"
+            className="w-full h-11 px-4 pr-12 border border-[#E5E7EB] bg-white text-[14px] leading-[100%] tracking-[0%] text-[#464646] rounded-sm cursor-pointer"
+            placeholderText="Select date"
+            isClearable
+            dayClassName={highlightDatesWithData}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+            yearDropdownItemNumber={10}
+            scrollableYearDropdown
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
