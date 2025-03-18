@@ -158,9 +158,11 @@ export default function CauseListsPage() {
                   {causeLists.map((causeList: CauseList) => (
                     <div key={causeList.id} className="flex flex-col w-full min-h-[300px]">
                       <div className="bg-[#F8F9FB] w-full flex-1">
-                        <h2 className="text-[#01292D] text-[22px] leading-[150%] tracking-[-0.02em] font-bold font-['Inter'] mb-4 px-4 pt-4">
-                          {causeList.title}
-                        </h2>
+                        <div className="h-[100px] px-4 pt-4">
+                          <h2 className="text-[#01292D] text-[22px] leading-[150%] tracking-[-0.02em] font-bold font-['Inter']">
+                            {causeList.title}
+                          </h2>
+                        </div>
                         
                         <div className="grid grid-cols-2 gap-x-4 px-4 pb-4">
                           {causeList.division ? (

@@ -131,9 +131,11 @@ export default function CauseListDetailPage({ params }: { params: { id: string }
                   className="bg-[#F8F9FB] flex flex-col"
                 >
                   <div className="p-4 flex-1">
-                    <h3 className="text-[#01292D] text-[22px] leading-[150%] tracking-[-0.02em] font-bold font-['Inter'] mb-4">
-                      {list.title}
-                    </h3>
+                    <div className="h-[100px]">
+                      <h3 className="text-[#01292D] text-[22px] leading-[150%] tracking-[-0.02em] font-bold font-['Inter']">
+                        {list.title}
+                      </h3>
+                    </div>
                     
                     <div className="grid grid-cols-2 gap-x-4 mb-4">
                       {list.division ? (

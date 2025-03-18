@@ -110,22 +110,22 @@ function generateMockData(id: string): CauseListDetail | null {
   
   switch (courtType) {
     case 'sc':
-      title = 'SUPREME COURT - CAUSE LIST';
+      title = `Supreme Court (${rest[rest.length - 1]}) Cause List`;
       break;
     case 'hc':
       const divIndex = parseInt(rest[1]) || 0;
       division = highCourtDivisions[divIndex % highCourtDivisions.length];
-      title = 'HIGH COURT - CAUSE LIST';
+      title = `High Court Cause List (Law Court Complex, Accra)`;
       break;
     case 'ca':
       division = rest[0] === 'civil' ? 'Civil Division' : 'Criminal Division';
-      title = `COURT OF APPEAL - CAUSE LIST (${division})`;
+      title = `Court of Appeal (${division}) Cause List`;
       break;
     case 'cc':
-      title = 'CIRCUIT COURT - CAUSE LIST';
+      title = `Circuit Court (Accra) Cause List`;
       break;
     case 'dc':
-      title = 'DISTRICT COURT - CAUSE LIST';
+      title = `District Court (Accra) Cause List`;
       break;
   }
 
