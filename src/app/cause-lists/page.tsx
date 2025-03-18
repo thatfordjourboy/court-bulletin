@@ -9,14 +9,18 @@ import { useCauseLists } from '@/hooks/useCauseLists';
 
 const ITEMS_PER_PAGE = 8;
 
-const getBackgroundColor = (courtType: string) => {
+export const getBackgroundColor = (courtType: string) => {
   switch (courtType) {
     case 'Supreme Court':
-      return 'bg-[#FFF8E7]';
+      return 'bg-[#FFEACB]';
     case 'High Court':
-      return 'bg-[#EBF8FF]';
+      return 'bg-[#C5E0FF]';
     case 'Court of Appeal':
-      return 'bg-[#FFF5F5]';
+      return 'bg-[#FFCDCE]';
+    case 'Circuit Court':
+      return 'bg-[#E8FFE4]';
+    case 'District Court':
+      return 'bg-[#F3E8FF]';
     default:
       return 'bg-[#F9FAFB]';
   }
@@ -150,10 +154,10 @@ export default function CauseListsPage() {
             ) : (
               <>
                 {/* Cause Lists grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-1 gap-y-12 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-12 mb-12">
                   {causeLists.map((causeList: CauseList) => (
-                    <div key={causeList.id} className="flex flex-col">
-                      <div className="bg-[#F8F9FB] w-fit">
+                    <div key={causeList.id} className="flex flex-col w-full min-h-[300px]">
+                      <div className="bg-[#F8F9FB] w-full flex-1">
                         <h2 className="text-[#01292D] text-[22px] leading-[150%] tracking-[-0.02em] font-bold font-['Inter'] mb-4 px-4 pt-4">
                           {causeList.title}
                         </h2>
@@ -185,12 +189,12 @@ export default function CauseListsPage() {
                         </div>
 
                         <div className="px-4 pb-4">
-                          <p className="text-sm text-[#464646]">{causeList.description}</p>
+                          <p className="text-sm text-[#464646] line-clamp-3">{causeList.description}</p>
                         </div>
                       </div>
 
-                      <div className="w-full bg-[#FFF8E7]">
-                        <div className="flex items-center gap-2 pt-4 pl-4">
+                      <div className={`w-full ${getBackgroundColor(causeList.courtType)}`}>
+                        <div className="flex items-center gap-2 pt-6">
                           <Link 
                             href={`/cause-lists/${causeList.id}/read`}
                             className="h-9 flex items-center px-3 border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white transition-colors text-sm font-semibold"

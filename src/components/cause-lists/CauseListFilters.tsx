@@ -13,6 +13,7 @@ type Props = {
 
 const courtTypes = [
   'Supreme Court',
+  'Court of Appeal',
   {
     name: 'High Court',
     divisions: [
@@ -28,8 +29,7 @@ const courtTypes = [
     ]
   },
   'Circuit Court',
-  'District Court',
-  'Court of Appeal'
+  'District Court'
 ];
 
 const regions = [
