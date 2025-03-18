@@ -22,7 +22,7 @@ export default function BulletinPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredBulletins, setFilteredBulletins] = useState<BulletinDocument[]>(mockBulletins);
   const [selectedDate, setSelectedDate] = useState('');
-  const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'oldest'>('relevance');
+  const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'oldest' | null>(null);
   const [isExplicitSearch, setIsExplicitSearch] = useState(false);
 
   // Clean text for search
@@ -114,8 +114,8 @@ export default function BulletinPage() {
       );
     }
 
-    // Sort bulletins by date if not a volume search
-    if (!searchQuery?.toLowerCase().includes('vol')) {
+    // Sort bulletins by date if not a volume search and sort is selected
+    if (!searchQuery?.toLowerCase().includes('vol') && sortBy) {
       filtered.sort((a, b) => {
         const dateA = new Date(a.date).getTime();
         const dateB = new Date(b.date).getTime();
@@ -149,7 +149,7 @@ export default function BulletinPage() {
   const handleReset = () => {
     setSearchQuery('');
     setSelectedDate('');
-    setSortBy('relevance');
+    setSortBy(null);
   };
 
   return (

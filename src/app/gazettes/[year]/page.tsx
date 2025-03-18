@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { gazetteYears } from '@/data/mockGazettes';
+import GazetteFilters from '@/components/gazettes/GazetteFilters';
 
 interface GazetteEntry {
   title: string;
@@ -30,13 +31,13 @@ export default function GazetteYearPage({ params }: PageParams) {
   const year = params.year;
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState(year);
-  const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'oldest'>('relevance');
+  const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'oldest' | null>(null);
   const [filteredGazettes, setFilteredGazettes] = useState<MonthGroup[]>([]);
   const [showYearPicker, setShowYearPicker] = useState(false);
 
   // Generate years for picker (e.g., last 10 years)
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+  const years = Array.from({ length: 10 }, (_, i) => String(currentYear - i));
 
   // Mock data - will come from backend
   const mockGazettes: MonthGroup[] = [
@@ -96,18 +97,18 @@ export default function GazetteYearPage({ params }: PageParams) {
     filtered = filtered.map(group => ({
       ...group,
       gazettes: [...group.gazettes].sort((a, b) => {
+        if (!sortBy) return 0;
         if (sortBy === 'newest') {
           return new Date(b.date).getTime() - new Date(a.date).getTime();
         } else if (sortBy === 'oldest') {
           return new Date(a.date).getTime() - new Date(b.date).getTime();
         }
-        // 'relevance' maintains original order
         return 0;
       })
     }));
 
     // Sort month groups for 'newest' and 'oldest'
-    if (sortBy !== 'relevance') {
+    if (sortBy && sortBy !== 'relevance') {
       filtered.sort((a, b) => {
         const aDate = new Date(a.gazettes[0].date);
         const bDate = new Date(b.gazettes[0].date);
@@ -142,7 +143,7 @@ export default function GazetteYearPage({ params }: PageParams) {
   const handleReset = () => {
     setSearchQuery('');
     setYearFilter(year);
-    setSortBy('relevance');
+    setSortBy(null);
   };
 
   return (
@@ -210,63 +211,20 @@ export default function GazetteYearPage({ params }: PageParams) {
         {/* Main content grid */}
         <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6">
           {/* Sidebar */}
-          <div className="w-full lg:w-[250px] h-[399px] bg-[#F3F5F8] p-5 flex flex-col lg:sticky lg:top-6 order-2 lg:order-1">
-            <button 
-              onClick={handleReset}
-              className="text-[#FF6B6B] underline decoration-1 hover:opacity-80 mb-3 text-left"
-            >
-              Reset all
-            </button>
-            
-            {/* Filter by year */}
-            <div className="w-[202px] pb-5 mb-[8px] border-b border-[#01292D] border-opacity-20">
-              <h3 className="text-base font-['Inter'] tracking-[0px] font-bold mb-3">Filter by year</h3>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Years"
-                  value={yearFilter}
-                  onChange={handleYearChange}
-                  className="w-[202px] h-[33px] border border-[#E5E7EB] rounded px-3 py-[6px] text-gray-500 placeholder-gray-400 bg-white flex justify-between"
-                />
-                <button 
-                  onClick={() => setShowYearPicker(true)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                >
-                  <svg width="17" height="19" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.375 18.25C1.89375 18.25 1.48177 18.0786 1.13906 17.7359C0.796354 17.3932 0.625 16.9812 0.625 16.5V4.25C0.625 3.76875 0.796354 3.35677 1.13906 3.01406C1.48177 2.67135 1.89375 2.5 2.375 2.5H3.25V0.75H5V2.5H12V0.75H13.75V2.5H14.625C15.1062 2.5 15.5182 2.67135 15.8609 3.01406C16.2036 3.35677 16.375 3.76875 16.375 4.25V16.5C16.375 16.9812 16.2036 17.3932 15.8609 17.7359C15.5182 18.0786 15.1062 18.25 14.625 18.25H2.375ZM2.375 16.5H14.625V7.75H2.375V16.5ZM2.375 6H14.625V4.25H2.375V6Z" fill="#01292D"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div className="w-full h-[1px] bg-[#01292D] opacity-20 mb-3" />
-
-            {/* Sort by */}
-            <div className="mb-5">
-              <h3 className="text-base font-['Inter'] tracking-[0px] font-bold mb-3">Sort by</h3>
-              <div className="flex flex-col gap-2">
-                {['Relevance', 'Newest', 'Oldest'].map((option) => (
-                  <button
-                    key={option}
-                    className={`w-[202px] h-[29px] px-3 py-[6px] bg-white text-left font-['Inter'] text-sm leading-[17px] tracking-[0px] text-[#464646] font-normal ${
-                      sortBy.toLowerCase() === option.toLowerCase() ? 'bg-[#F3F5F8]' : ''
-                    }`}
-                    onClick={() => setSortBy(option.toLowerCase() as any)}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button 
-              onClick={handleYearSubmit}
-              className="w-[202px] bg-[#01292D] text-[#8DFFDD] py-2 px-4 flex items-center justify-between rounded mb-5 mt-auto"
-            >
-              <span className="font-['Inter'] text-base font-light">View result</span>
-              <span className="text-xl">→</span>
-            </button>
+          <div className="w-full lg:w-[250px] bg-[#F3F5F8] p-5 flex flex-col lg:sticky lg:top-6 order-2 lg:order-1 h-fit">
+            <GazetteFilters
+              onYearChange={(year) => {
+                if (year && year !== params.year) {
+                  router.push(`/gazettes/${year}`);
+                }
+              }}
+              onSortChange={(sort) => setSortBy(sort)}
+              onReset={handleReset}
+              selectedYear={yearFilter}
+              selectedSort={sortBy}
+              isLoading={false}
+              years={years}
+            />
           </div>
 
           {/* Main content table */}
