@@ -261,7 +261,7 @@ export default function CauseListFilters({
         className="pb-5 mb-[8px] border-b-2 border-[#01292D] border-opacity-20"
       >
         <h3 className="text-base font-['Inter'] tracking-[0px] font-bold mb-3">Filter by date</h3>
-        <div className="space-y-3">
+      <div className="space-y-3">
           <motion.div 
             className="relative"
             whileHover={{ scale: 1.002 }}
@@ -291,12 +291,12 @@ export default function CauseListFilters({
               }}
               transition={{ duration: 0.3 }}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.3333 1.66666V4.99999" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6.66667 1.66666V4.99999" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2.5 8.33334H17.5" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M13.3333 1.66666V4.99999" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M6.66667 1.66666V4.99999" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2.5 8.33334H17.5" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             </motion.div>
           </motion.div>
         </div>
@@ -342,7 +342,7 @@ export default function CauseListFilters({
                   >
                     {typeof court === 'string' ? court : court.name}
                   </motion.span>
-                  {typeof court !== 'string' && (
+                {typeof court !== 'string' && (
                     <motion.svg 
                       animate={{ 
                         rotate: showHighCourtDivisions ? 180 : 0,
@@ -350,30 +350,30 @@ export default function CauseListFilters({
                       }}
                       transition={{ duration: 0.3 }}
                       className="ml-2 flex-shrink-0"
-                      width="20" 
-                      height="20" 
-                      viewBox="0 0 20 20" 
-                      fill="none" 
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M5 7.5L10 12.5L15 7.5" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 20 20" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M5 7.5L10 12.5L15 7.5" stroke="#464646" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </motion.svg>
-                  )}
+                )}
                 </div>
               </motion.button>
               <AnimatePresence>
-                {typeof court !== 'string' && court.divisions && showHighCourtDivisions && (
+              {typeof court !== 'string' && court.divisions && showHighCourtDivisions && (
                   <motion.div 
-                    ref={dropdownRef}
+                  ref={dropdownRef}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                     className="absolute left-0 top-full mt-1 w-[280px] bg-white shadow-lg rounded-sm border border-[#E5E7EB] z-50 py-1 overflow-hidden"
-                  >
-                    {court.divisions.map((division) => (
+                >
+                  {court.divisions.map((division) => (
                       <motion.button
-                        key={division}
+                      key={division}
                         variants={buttonVariants}
                         initial="initial"
                         whileHover="hover"
@@ -390,8 +390,8 @@ export default function CauseListFilters({
                             x: hoveredCourt === division ? 2 : 0,
                             color: selectedCourtType === division ? '#01292D' : '#464646'
                           }}
-                        >
-                          {division}
+                    >
+                      {division}
                         </motion.span>
                         <motion.div
                           initial={false}
@@ -438,8 +438,8 @@ export default function CauseListFilters({
                   x: hoveredRegion === region ? 2 : 0,
                   color: selectedRegion === region ? '#01292D' : '#464646'
                 }}
-              >
-                {region}
+            >
+              {region}
               </motion.span>
               <motion.div
                 initial={false}

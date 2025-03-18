@@ -320,7 +320,7 @@ export default function GazetteYearPage({ params }: PageParams) {
                       </div>
                       <div className="grid grid-cols-3 gap-x-2 gap-y-2">
                         {decadeYears.map((year) => (
-                          <button
+                  <button
                             key={year}
                             onClick={() => handleYearSelect(year.toString())}
                             className={`py-2 px-3 text-base font-normal text-center rounded-sm transition-colors outline-none
@@ -346,8 +346,8 @@ export default function GazetteYearPage({ params }: PageParams) {
                             data-year={year}
                           >
                             {year}
-                          </button>
-                        ))}
+                  </button>
+                ))}
                       </div>
                     </div>
                   );

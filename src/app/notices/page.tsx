@@ -62,6 +62,9 @@ export default function NoticesPage() {
     });
 
     setFilteredNotices(filtered);
+    
+    // Scroll to top when filters change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [searchQuery, dateFilter, noticeTypeFilter, courtTypeFilter, sortBy]);
 
   // Handle search

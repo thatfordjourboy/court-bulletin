@@ -309,4 +309,4 @@ const BulletinFilters = ({
   );
 };
 
-export default BulletinFilters;
+export default BulletinFilters; 
