@@ -11,11 +11,12 @@ export type CauseList = {
 // Helper function to generate dates for the last 3 months
 const generateRecentDates = () => {
   const dates = [];
-  const today = new Date();
+  // Use a fixed date as the starting point
+  const startDate = new Date(2024, 0, 1); // January 1, 2024
   
   for (let i = 0; i < 90; i++) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
     if (date.getDay() !== 0 && date.getDay() !== 6) { // Exclude weekends
       dates.push(date.toLocaleDateString('en-GB', { 
         day: 'numeric',
@@ -27,6 +28,7 @@ const generateRecentDates = () => {
   return dates;
 };
 
+// Generate dates once and store them
 const dates = generateRecentDates();
 
 const highCourtDivisions = [

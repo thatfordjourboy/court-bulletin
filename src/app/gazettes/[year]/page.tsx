@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { gazetteYears } from '@/data/mockGazettes';
 
 interface GazetteEntry {
   title: string;
@@ -317,7 +318,7 @@ export default function GazetteYearPage({ params }: PageParams) {
       {/* Year Picker Modal */}
       {showYearPicker && (
         <div className="fixed inset-0 flex items-start justify-center z-50 pt-[120px]">
-          <div className="bg-white rounded-lg shadow-lg w-[296px]">
+          <div className="bg-white rounded-lg shadow-lg w-[320px]">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-[#01292D] text-lg font-semibold">Select Year</h3>
@@ -330,19 +331,69 @@ export default function GazetteYearPage({ params }: PageParams) {
                   </svg>
                 </button>
               </div>
-              <div className="grid grid-cols-3 gap-x-4 gap-y-3">
-                {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016].map((y) => (
-                  <button
-                    key={y}
-                    onClick={() => handleYearSelect(y.toString())}
-                    className={`py-2 px-3 text-base font-normal text-center rounded-sm transition-colors
-                      ${yearFilter === y.toString() 
-                        ? 'bg-[#F3F5F8] text-[#01292D]' 
-                        : 'text-[#464646] hover:bg-[#F3F5F8]'}`}
-                  >
-                    {y}
-                  </button>
-                ))}
+
+              {/* Quick actions */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => handleYearSelect(new Date().getFullYear().toString())}
+                  className="flex-1 py-2 px-3 text-sm font-medium text-[#01292D] bg-[#F3F5F8] hover:bg-[#E5E7EB] rounded-sm transition-colors"
+                >
+                  Current Year
+                </button>
+                <button
+                  onClick={() => handleYearSelect(gazetteYears[0].year)}
+                  className="flex-1 py-2 px-3 text-sm font-medium text-[#01292D] bg-[#F3F5F8] hover:bg-[#E5E7EB] rounded-sm transition-colors"
+                >
+                  Most Recent
+                </button>
+              </div>
+
+              {/* Decade separators and year grid */}
+              <div className="max-h-[320px] overflow-y-auto pr-2">
+                {Array.from({ length: Math.ceil((2024 - 1959 + 1) / 10) }, (_, i) => {
+                  const decadeStart = 2024 - (i * 10);
+                  const decadeYears = Array.from({ length: 10 }, (_, j) => decadeStart - j)
+                    .filter(year => year >= 1959);
+                  
+                  return (
+                    <div key={decadeStart} className="mb-4">
+                      <div className="text-sm text-[#464646] mb-2 font-medium">
+                        {`${decadeStart - 9} - ${decadeStart}`}
+                      </div>
+                      <div className="grid grid-cols-3 gap-x-2 gap-y-2">
+                        {decadeYears.map((year) => (
+                          <button
+                            key={year}
+                            onClick={() => handleYearSelect(year.toString())}
+                            className={`py-2 px-3 text-base font-normal text-center rounded-sm transition-colors outline-none
+                              ${yearFilter === year.toString() 
+                                ? 'bg-[#01292D] text-white' 
+                                : 'text-[#464646] hover:bg-[#F3F5F8] focus:ring-2 focus:ring-[#64CCC5]'}`}
+                            onKeyDown={(e) => {
+                              const currentIndex = decadeYears.indexOf(year);
+                              if (e.key === 'ArrowRight' && currentIndex < decadeYears.length - 1) {
+                                e.preventDefault();
+                                (document.querySelector(`button[data-year="${decadeYears[currentIndex + 1]}"]`) as HTMLButtonElement)?.focus();
+                              } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                                e.preventDefault();
+                                (document.querySelector(`button[data-year="${decadeYears[currentIndex - 1]}"]`) as HTMLButtonElement)?.focus();
+                              } else if (e.key === 'ArrowUp' && currentIndex >= 3) {
+                                e.preventDefault();
+                                (document.querySelector(`button[data-year="${decadeYears[currentIndex - 3]}"]`) as HTMLButtonElement)?.focus();
+                              } else if (e.key === 'ArrowDown' && currentIndex + 3 < decadeYears.length) {
+                                e.preventDefault();
+                                (document.querySelector(`button[data-year="${decadeYears[currentIndex + 3]}"]`) as HTMLButtonElement)?.focus();
+                              }
+                            }}
+                            data-year={year}
+                          >
+                            {year}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
