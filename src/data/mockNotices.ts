@@ -1,13 +1,30 @@
 export interface Notice {
   id: string;
-  type: 'GENERAL_NOTICES' | 'ANNOUNCEMENTS' | 'PRACTICE_DIRECTION' | 'ESTATE_NOTICES' | 'JUDICIAL_NOTICES' | 'SUBSTITUTED_SERVICE_NOTICES';
+  type: 'GENERAL_NOTICES' | 'JUDICIAL_NOTICES' | 'PRACTICE_DIRECTION' | 'SUBSTITUTED_SERVICE_NOTICES' | 'ESTATE_NOTICES' | 'ANNOUNCEMENTS';
   title: string;
-  suitNumber: string;
+  suitNumber?: string; // Optional, only for SUBSTITUTED_SERVICE_NOTICES and ESTATE_NOTICES
+  referenceNumber?: string; // Optional, for all other notice types
   servedDate: string;
   servedTime: string;
   court: string;
   division?: string;
   expiryDate: string;
+  content: string;
+  signatory: string;
+  signatoryTitle: string;
+  bulletinVolume: string;
+  // Additional fields for Substituted Service Notices
+  parties?: {
+    applicant: {
+      name: string;
+      type: string;
+    };
+    respondent: {
+      name: string;
+      type: string;
+    };
+  };
+  orderImages?: string[]; // Array of image URLs for the order documents
 }
 
 // Helper function to generate future date
@@ -75,646 +92,287 @@ const getRandomNoticeType = () => {
   return types[Math.floor(Math.random() * types.length)] as Notice['type'];
 };
 
-export const mockNotices: Notice[] = [
-  {
-    id: '1',
-    type: 'GENERAL_NOTICES',
-    title: 'GBA Notice to all Lawyers',
-    suitNumber: 'J5/05/2024',
-    servedDate: '2024-01-02',
-    servedTime: '5:00 pm',
-    court: 'High Court',
-    division: 'Commercial Division',
-    expiryDate: getFutureDate(4)
-  },
-  {
-    id: '2',
-    type: 'ANNOUNCEMENTS',
-    title: 'Appointment of Supreme Court Justices',
-    suitNumber: 'J5/05/2024',
-    servedDate: '2024-01-02',
-    servedTime: '5:00 pm',
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(4)
-  },
-  {
-    id: '3',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Practice Direction - Virtual Court Session',
-    suitNumber: 'J5/05/2024',
-    servedDate: '2024-01-02',
-    servedTime: '5:00 pm',
-    court: 'High Court',
-    division: 'General Jurisdiction',
-    expiryDate: getFutureDate(4)
-  },
-  {
-    id: '4',
-    type: 'ESTATE_NOTICES',
-    title: 'Estate of Late Justice Anin - Probate Notice',
-    suitNumber: 'J5/05/2024',
-    servedDate: '2024-01-02',
-    servedTime: '5:00 pm',
-    court: 'High Court',
-    division: 'Probate and Administration Division',
-    expiryDate: getFutureDate(4)
-  },
-  {
-    id: '5',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Notice of Court Vacation',
-    suitNumber: 'J5/06/2024',
-    servedDate: '2024-01-03',
-    servedTime: '3:00 pm',
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(7)
-  },
-  {
-    id: '6',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'Republic v. John Doe - Criminal Case',
-    suitNumber: 'HCCR/123/2024',
-    servedDate: '2024-01-04',
-    servedTime: '2:00 pm',
-    court: 'High Court',
-    division: 'Criminal Division',
-    expiryDate: getFutureDate(10)
-  },
-  {
-    id: '7',
-    type: 'GENERAL_NOTICES',
-    title: 'Land Title Registration Notice',
-    suitNumber: 'HLC/11/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Land Court',
-    expiryDate: getFutureDate(15)
-  },
-  {
-    id: '8',
-    type: 'ANNOUNCEMENTS',
-    title: 'New Court Complex Opening Ceremony',
-    suitNumber: 'J9/12/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(20)
-  },
-  {
-    id: '9',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Matrimonial Causes Filing Guidelines',
-    suitNumber: 'HCMD/13/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Divorce and Matrimonial Division',
-    expiryDate: getFutureDate(25)
-  },
-  {
-    id: '10',
-    type: 'ESTATE_NOTICES',
-    title: 'Estate of Late Chief Justice - Probate Notice',
-    suitNumber: 'HCPA/14/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Probate and Administration Division',
-    expiryDate: getFutureDate(30)
-  },
-  {
-    id: '11',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Industrial Dispute Resolution Guidelines',
-    suitNumber: 'HCLD/15/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Labour Division',
-    expiryDate: getFutureDate(12)
-  },
-  {
-    id: '12',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'Human Rights Case 456/2024',
-    suitNumber: 'HCHR/16/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Human Rights Division',
-    expiryDate: getFutureDate(18)
-  },
-  {
-    id: '13',
-    type: 'GENERAL_NOTICES',
-    title: 'Bar Association Annual Conference',
-    suitNumber: 'J14/17/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(22)
-  },
-  {
-    id: '14',
-    type: 'ANNOUNCEMENTS',
-    title: 'Commercial Court Special Session',
-    suitNumber: 'HCCD/18/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Commercial Division',
-    expiryDate: getFutureDate(28)
-  },
-  {
-    id: '15',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Financial Cases Filing Protocol',
-    suitNumber: 'HCFD/19/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Financial Division',
-    expiryDate: getFutureDate(35)
-  },
-  {
-    id: '16',
-    type: 'ESTATE_NOTICES',
-    title: 'Multiple Beneficiaries Estate Case',
-    suitNumber: 'HCPA/20/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Probate and Administration Division',
-    expiryDate: getFutureDate(40)
-  },
-  {
-    id: '17',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Land Acquisition Proceedings',
-    suitNumber: 'HLC/21/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Land Court',
-    expiryDate: getFutureDate(45)
-  },
-  {
-    id: '18',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'International Service Request - Case 101/2024',
-    suitNumber: 'J19/22/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'International Division',
-    expiryDate: getFutureDate(50)
-  },
-  {
-    id: '19',
-    type: 'GENERAL_NOTICES',
-    title: 'Law Reports Publication Update',
-    suitNumber: 'J20/23/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(55)
-  },
-  {
-    id: '20',
-    type: 'ANNOUNCEMENTS',
-    title: 'New Legal Year Opening Ceremony',
-    suitNumber: 'J21/24/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(60)
-  },
-  {
-    id: '21',
-    type: 'GENERAL_NOTICES',
-    title: 'Mandatory E-Filing System Training Sessions',
-    suitNumber: 'J22/25/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: getRandomCourt(),
-    division: getRandomDivision(),
-    expiryDate: getFutureDate(30)
-  },
-  {
-    id: '22',
-    type: 'ANNOUNCEMENTS',
-    title: 'Chief Justice Annual Address to the Bar',
-    suitNumber: 'J23/26/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(25)
-  },
-  {
-    id: '23',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Updated Guidelines for Remote Court Hearings',
-    suitNumber: 'J24/27/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'All Courts',
-    expiryDate: getFutureDate(45)
-  },
-  {
-    id: '24',
-    type: 'ESTATE_NOTICES',
-    title: 'Estate of Former Chief Justice - Probate Notice',
-    suitNumber: 'J25/28/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Probate Division',
-    expiryDate: getFutureDate(60)
-  },
-  {
-    id: '25',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Revised Court Fees and Charges 2024',
-    suitNumber: 'J26/29/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'All Courts',
-    expiryDate: getFutureDate(90)
-  },
-  {
-    id: '26',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'International Corporate Dispute - Service Notice',
-    suitNumber: 'J27/30/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Commercial Court',
-    division: 'International Division',
-    expiryDate: getFutureDate(40)
-  },
-  {
-    id: '27',
-    type: 'GENERAL_NOTICES',
-    title: 'Court Library System Upgrade Notice',
-    suitNumber: 'J28/31/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: getRandomCourt(),
-    expiryDate: getFutureDate(15)
-  },
-  {
-    id: '28',
-    type: 'ANNOUNCEMENTS',
-    title: 'Appointment of New Court Registrars',
-    suitNumber: 'J29/32/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: getRandomCourt(),
-    expiryDate: getFutureDate(20)
-  },
-  {
-    id: '29',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Guidelines for Filing Constitutional Matters',
-    suitNumber: 'J30/33/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(75)
-  },
-  {
-    id: '30',
-    type: 'ESTATE_NOTICES',
-    title: 'Multiple Beneficiaries Estate Distribution Notice',
-    suitNumber: 'J31/34/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Probate Division',
-    expiryDate: getFutureDate(50)
-  },
-  {
-    id: '31',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Court Premises Renovation Schedule',
-    suitNumber: 'J32/35/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: getRandomCourt(),
-    expiryDate: getFutureDate(100)
-  },
-  {
-    id: '32',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'Cross-Border Litigation Service Notice',
-    suitNumber: 'J33/36/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'International Division',
-    expiryDate: getFutureDate(45)
-  },
-  {
-    id: '33',
-    type: 'GENERAL_NOTICES',
-    title: 'Court Security Protocol Updates',
-    suitNumber: 'J34/37/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'All Courts',
-    expiryDate: getFutureDate(30)
-  },
-  {
-    id: '34',
-    type: 'ANNOUNCEMENTS',
-    title: 'Legal Year Calendar 2024-2025',
-    suitNumber: 'J35/38/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(120)
-  },
-  {
-    id: '35',
-    type: 'PRACTICE_DIRECTION',
-    title: 'New Rules for Commercial Arbitration',
-    suitNumber: 'J36/39/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Commercial Court',
-    expiryDate: getFutureDate(60)
-  },
-  {
-    id: '36',
-    type: getRandomNoticeType(),
-    title: 'Judicial Ethics Committee Formation',
-    suitNumber: 'J37/40/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'Supreme Court',
-    expiryDate: getFutureDate(45)
-  },
-  {
-    id: '37',
-    type: getRandomNoticeType(),
-    title: 'Court Technology Innovation Program',
-    suitNumber: 'J38/41/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: getRandomCourt(),
-    division: getRandomDivision(),
-    expiryDate: getFutureDate(80)
-  },
-  {
-    id: '38',
-    type: getRandomNoticeType(),
-    title: 'Legal Aid Services Expansion Notice',
-    suitNumber: 'J39/42/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: getRandomCourt(),
-    expiryDate: getFutureDate(40)
-  },
-  {
-    id: '39',
-    type: getRandomNoticeType(),
-    title: 'Court Mediation Program Launch',
-    suitNumber: 'J40/43/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: getRandomCourt(),
-    division: getRandomDivision(),
-    expiryDate: getFutureDate(70)
-  },
-  {
-    id: '40',
-    type: getRandomNoticeType(),
-    title: 'Judicial Staff Training Programs',
-    suitNumber: 'J41/44/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'All Courts',
-    expiryDate: getFutureDate(55)
-  },
-  {
-    id: '41',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Criminal Appeal Hearing Notice',
-    suitNumber: 'HCCR/157/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Criminal Division',
-    expiryDate: getFutureDate(30)
-  },
-  {
-    id: '42',
-    type: 'GENERAL_NOTICES',
-    title: 'Land Title Dispute - Accra Central',
-    suitNumber: 'HLC/203/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Land Court',
-    expiryDate: getFutureDate(45)
-  },
-  {
-    id: '43',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'Divorce Petition Notice',
-    suitNumber: 'HCMD/89/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Divorce and Matrimonial Division',
-    expiryDate: getFutureDate(60)
-  },
-  {
-    id: '44',
-    type: 'ESTATE_NOTICES',
-    title: 'Letters of Administration Application',
-    suitNumber: 'HCPA/167/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Probate and Administration Division',
-    expiryDate: getFutureDate(40)
-  },
-  {
-    id: '45',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Trade Union Dispute Resolution',
-    suitNumber: 'HCLD/112/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Labour Division',
-    expiryDate: getFutureDate(30)
-  },
-  {
-    id: '46',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Constitutional Rights Case Hearing',
-    suitNumber: 'HCHR/78/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Human Rights Division',
-    expiryDate: getFutureDate(25)
-  },
-  {
-    id: '47',
-    type: 'ANNOUNCEMENTS',
-    title: 'Banking Sector Litigation Notice',
-    suitNumber: 'HCCD/145/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Commercial Division',
-    expiryDate: getFutureDate(35)
-  },
-  {
-    id: '48',
-    type: 'GENERAL_NOTICES',
-    title: 'Securities Trading Dispute',
-    suitNumber: 'HCFD/92/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Financial Division',
-    expiryDate: getFutureDate(50)
-  },
-  {
-    id: '49',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Civil Case Management Conference',
-    suitNumber: 'HCGJ/134/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'General Jurisdiction',
-    expiryDate: getFutureDate(20)
-  },
-  {
-    id: '50',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'Murder Trial Proceedings',
-    suitNumber: 'HCCR/198/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Criminal Division',
-    expiryDate: getFutureDate(15)
-  },
-  {
-    id: '51',
-    type: 'GENERAL_NOTICES',
-    title: 'Land Registration Appeal',
-    suitNumber: 'HLC/221/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Land Court',
-    expiryDate: getFutureDate(40)
-  },
-  {
-    id: '52',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Child Custody Case Hearing',
-    suitNumber: 'HCMD/156/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Divorce and Matrimonial Division',
-    expiryDate: getFutureDate(30)
-  },
-  {
-    id: '53',
-    type: 'ESTATE_NOTICES',
-    title: 'Contested Will Proceedings',
-    suitNumber: 'HCPA/189/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Probate and Administration Division',
-    expiryDate: getFutureDate(55)
-  },
-  {
-    id: '54',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Workplace Discrimination Case',
-    suitNumber: 'HCLD/167/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Labour Division',
-    expiryDate: getFutureDate(45)
-  },
-  {
-    id: '55',
-    type: 'ANNOUNCEMENTS',
-    title: 'Freedom of Expression Case',
-    suitNumber: 'HCHR/143/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Human Rights Division',
-    expiryDate: getFutureDate(35)
-  },
-  {
-    id: '56',
-    type: 'GENERAL_NOTICES',
-    title: 'Corporate Merger Dispute',
-    suitNumber: 'HCCD/178/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Commercial Division',
-    expiryDate: getFutureDate(60)
-  },
-  {
-    id: '57',
-    type: 'PRACTICE_DIRECTION',
-    title: 'Investment Fund Litigation',
-    suitNumber: 'HCFD/134/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Financial Division',
-    expiryDate: getFutureDate(40)
-  },
-  {
-    id: '58',
-    type: 'JUDICIAL_NOTICES',
-    title: 'Complex Civil Litigation',
-    suitNumber: 'HCGJ/187/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'General Jurisdiction',
-    expiryDate: getFutureDate(50)
-  },
-  {
-    id: '59',
-    type: 'SUBSTITUTED_SERVICE_NOTICES',
-    title: 'Armed Robbery Trial Notice',
-    suitNumber: 'HCCR/212/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Criminal Division',
-    expiryDate: getFutureDate(25)
-  },
-  {
-    id: '60',
-    type: 'GENERAL_NOTICES',
-    title: 'Property Boundary Dispute',
-    suitNumber: 'HLC/245/2024',
-    servedDate: getRandomDate(),
-    servedTime: getRandomTime(),
-    court: 'High Court',
-    division: 'Land Court',
-    expiryDate: getFutureDate(45)
+// Helper function to get random signatory
+function getRandomSignatory(): string {
+  const signatories = [
+    "John Smith",
+    "Emma Johnson",
+    "Michael Brown",
+    "Sarah Wilson",
+    "David Taylor"
+  ];
+  return signatories[Math.floor(Math.random() * signatories.length)];
+}
+
+// Helper function to get random signatory title
+function getRandomSignatoryTitle(): string {
+  const titles = [
+    "Court Registrar",
+    "Deputy Registrar",
+    "Chief Justice's Secretary",
+    "Court Administrator",
+    "Legal Secretary"
+  ];
+  return titles[Math.floor(Math.random() * titles.length)];
+}
+
+// Helper function to generate random title
+const getRandomTitle = (type: Notice['type']) => {
+  if (type === 'SUBSTITUTED_SERVICE_NOTICES') {
+    const plaintiffs = [
+      'The Special Prosecutor',
+      'The Republic',
+      'The Attorney General',
+      'Ghana Revenue Authority',
+      'Bank of Ghana'
+    ];
+    const defendants = [
+      'Anthony Gyasi',
+      'John Mensah',
+      'Kwame Addo',
+      'Samuel Owusu',
+      'Grace Asante',
+      'Pacific Industries Ltd',
+      'Sunrise Enterprises'
+    ];
+    const plaintiff = plaintiffs[Math.floor(Math.random() * plaintiffs.length)];
+    const defendant = defendants[Math.floor(Math.random() * defendants.length)];
+    return `${plaintiff} v. ${defendant}`;
   }
-]; 
+
+  const subjects = [
+    'Virtual Court Session',
+    'Legal Practice Guidelines',
+    'Court Proceedings Update',
+    'Bar Association Meeting',
+    'Legal Education Requirements',
+    'Court Calendar Changes',
+    'Professional Ethics Update',
+    'Case Management Notice'
+  ];
+  return subjects[Math.floor(Math.random() * subjects.length)];
+};
+
+// Helper function to generate random suit number
+const getRandomSuitNumber = () => {
+  return `J${Math.floor(Math.random() * 100)}/${new Date().getFullYear()}`;
+};
+
+const getRandomApplicant = () => {
+  const applicants = [
+    'The Special Prosecutor',
+    'The Attorney General',
+    'The Electoral Commission',
+    'The Ghana Bar Association'
+  ];
+  return applicants[Math.floor(Math.random() * applicants.length)];
+};
+
+const getRandomRespondent = () => {
+  const respondents = [
+    'Anthony Gyasi',
+    'John Smith',
+    'Mary Johnson',
+    'Samuel Addo'
+  ];
+  return respondents[Math.floor(Math.random() * respondents.length)];
+};
+
+// Helper function to format notice type for display
+const formatNoticeType = (type: Notice['type']) => {
+  const formatted = type.split('_').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+  
+  // Only remove 'Notices' from Estate Notices
+  if (type === 'ESTATE_NOTICES') {
+    return formatted.replace(' Notices', '');
+  }
+  
+  return formatted;
+};
+
+// Helper function to get content based on notice type
+const getNoticeContent = (type: Notice['type'], title: string) => {
+  if (type === 'PRACTICE_DIRECTION' && title.toLowerCase().includes('virtual court')) {
+    return `A DIRECTION to provide for protocols in virtual court hearings and to provide for efficient management of the remote/virtual hearing proceedings and related matters.
+
+Being guided by the provisions of Article 125 (4) of the Constitution, 1992, Section 69 (1) of the Courts Act 1993 Act 459 and Orders 38 Rule 3A and 41 Rule 2A of the High Court (Civil Procedure) Rules, 2004 (C.I. 47) as amended by C.I. 87 of 2014, I direct that until statutory provisions are made, the remote/virtual hearing of cases in all Courts in the Country shall be governed as follows:
+
+A. GENERAL
+
+1. The faces of all participants in virtual court hearing MUST be visible and ensure that the face is not turned towards a source of light. Participants must properly position cameras for clarity of image. As much as possible use a plain background.
+2. All participants MUST mute microphones to minimize and conceal any background noise.
+3. No participant can eat or drink while in a virtual session.
+4. In order to minimize distractions and disruptions during the court sessions, all participants MUST raise their hands when they need to speak or use the Chat Box. Raising of hands is enabled by selecting the "Show Reactions" button/bar at the bottom of the screen in the meeting controls and then selecting "Raise Hand".
+5. Applications and Affidavits must be filed with a skeletal brief of the legal arguments and authorities to be presented to the Court. Judges are to allocate not more than 5 - 7 minutes to any participant who wishes to highlight any important point. This is to avoid the time spent on viva voce arguments and reduce the waiting time for other participants.
+
+B. TECHNICAL
+
+1. The virtual court hyperlink for every court shall be displayed on the website of the Judicial Service of Ghana in compliance with Order 1 Rule 2(1) of CI 47. The hyperlink for a particular court shall cease to be accessible except for the records of the court.
+2. Access to audio recordings shall be restricted subject to statutory requirements and the rules of procedure. Any request for audio transcripts for a court sitting MUST be made within a period of 90 days. and subject to the rules of court stored for Back up procedures for audio and text transcripts for each court sitting shall be implemented to ensure that the data is stored for no less than 90 days.
+3. The Judicial Service of Ghana shall maintain a backup system that shall be located and maintained in the place as the Chief Justice shall determine.
+4. Microsoft Teams is the official medium of conducting the virtual sessions. Covering device must be fully charged and have internet connectivity.
+5. All participants MUST ensure they have strong internet connectivity.
+6. All participants MUST endeavor to have uninterrupted power back-up at all material times during a virtual session. Back-up may include generator, UPS, power banks etc.
+7. All participants MUST endeavor to have uninterrupted internet supply at all material times during a virtual session. This may include modems, Wi- Fi and data bundles.
+8. The use of headsets is recommended to increase both privacy and audibility of participants.`;
+  }
+  
+  if (type === 'SUBSTITUTED_SERVICE_NOTICES') {
+    return `IT IS HEREBY ORDERED that; the order for Confirmation of seizure of suspected tainted property with the accompanying affidavit in support and annexures be served on the Defendant by Substituted Service in the following manner for a period of 7 days. a. By posting a copy of the said Application for an Order of Confirmation of seizure of suspected tainted property with the accompanying affidavit in support and annexures together with a copy the Order for Substituted Service on the Notice Board of the High Court, General Jurisdiction Division. b. By delivering the said application with its accompanying affidavit in support and annexures together with the copy of the Order by Substituted Service to any adult person living at the last known residence of the Respondent; c. By publishing a copy of the said application with its accompanying affidavit in support and annexures together with a copy of the Order for Substituted Service on the Applicant's official website.`;
+  }
+
+  if (type === 'PRACTICE_DIRECTION') {
+    return `A DIRECTION to provide guidelines for ${title.toLowerCase()}.
+
+Being guided by the provisions of Article 125 (4) of the Constitution, 1992, and Section 69 (1) of the Courts Act 1993 Act 459, the following directions are hereby issued:
+
+1. All legal practitioners and court users are required to comply with these guidelines.
+2. These guidelines shall come into effect immediately.
+3. Non-compliance with these guidelines may result in appropriate sanctions.
+4. The Registrar shall ensure proper dissemination of these guidelines.`;
+  }
+
+  // Default content for other notice types
+  return "It is notified for lawyers that the mandatory requirement under Regulation 84 of the Legal Profession (Professional Conduct and Etiquette) Rules, 2020 (L.I. 2423) directing lawyers to show proof of Continuous Legal Education (CLE) participation for Solicitors Licence renewal will come into effect in 2024. Hence applications for 2025 Solicitors Licenses will consider CLE Hours earned in 2024.";
+};
+
+// Helper function to generate sequential dates for substituted service notices
+const getSequentialDate = (index: number) => {
+  const today = new Date();
+  const date = new Date(today);
+  date.setDate(today.getDate() - index); // Each notice will be 1 day older
+  return date.toISOString().split('T')[0];
+};
+
+// Helper function to generate consistent title
+const getConsistentTitle = (type: Notice['type'], index: number) => {
+  const titles: Record<Exclude<Notice['type'], 'SUBSTITUTED_SERVICE_NOTICES'>, string[]> = {
+    'PRACTICE_DIRECTION': [
+      'Practice Direction - Virtual Court Session',
+      'Practice Direction - Legal Practice Guidelines',
+      'Practice Direction - Court Proceedings',
+      'Practice Direction - Case Management',
+      'Practice Direction - Professional Ethics'
+    ],
+    'JUDICIAL_NOTICES': [
+      'Supreme Court Term Dates',
+      'Court Calendar Update',
+      'Judicial Working Hours',
+      'Court Vacation Notice',
+      'Special Sitting Notice'
+    ],
+    'GENERAL_NOTICES': [
+      'Bar Association Meeting',
+      'Legal Education Requirements',
+      'Professional Ethics Update',
+      'Court Fee Updates',
+      'Legal Aid Services'
+    ],
+    'ANNOUNCEMENTS': [
+      'New Chief Justice Appointment',
+      'Court Complex Renovation',
+      'E-Justice System Launch',
+      'Legal Year Opening',
+      'Judicial Conference'
+    ],
+    'ESTATE_NOTICES': [
+      'Estate of John Doe',
+      'Estate of Jane Smith',
+      'Estate of Samuel Mensah',
+      'Estate of Grace Addo',
+      'Estate of Kwame Nkrumah'
+    ]
+  };
+
+  return titles[type as keyof typeof titles][index % 5];
+};
+
+// Helper function to generate sequential reference numbers
+const getSequentialReferenceNumber = (type: Notice['type'], index: number) => {
+  const year = new Date().getFullYear();
+  const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+  const prefixes = {
+    'PRACTICE_DIRECTION': 'PD',
+    'JUDICIAL_NOTICES': 'JN',
+    'GENERAL_NOTICES': 'GN',
+    'ANNOUNCEMENTS': 'AN',
+    'ESTATE_NOTICES': 'EN'
+  };
+  const prefix = prefixes[type as keyof typeof prefixes] || 'REF';
+  const sequence = (index + 1).toString().padStart(3, '0');
+  return `${prefix}/${month}/${sequence}/${year}`;
+};
+
+// Helper function to generate sequential suit numbers
+const getSequentialSuitNumber = (index: number) => {
+  return `J${(80 - index).toString().padStart(2, '0')}/2025`;
+};
+
+// Generate mock notices
+export const mockNotices: Notice[] = Array.from({ length: 60 }, (_, i) => {
+  // Use consistent notice types based on index
+  const types: Notice['type'][] = [
+    'PRACTICE_DIRECTION',
+    'JUDICIAL_NOTICES',
+    'GENERAL_NOTICES',
+    'ANNOUNCEMENTS',
+    'ESTATE_NOTICES',
+    'SUBSTITUTED_SERVICE_NOTICES'
+  ];
+  const type = types[i % types.length];
+  const isSubstitutedService = type === 'SUBSTITUTED_SERVICE_NOTICES';
+  const isEstateNotice = type === 'ESTATE_NOTICES';
+  const needsSuitNumber = isSubstitutedService || isEstateNotice;
+  
+  // For substituted service notices, get applicant and respondent first
+  const applicant = isSubstitutedService ? getRandomApplicant() : '';
+  const respondent = isSubstitutedService ? getRandomRespondent() : '';
+  
+  // Set title based on notice type using consistent titles
+  const title = isSubstitutedService ? 
+    `${applicant} v. ${respondent}` : 
+    getConsistentTitle(type, Math.floor(i / 6));
+
+  // Base notice object
+  const notice: Notice = {
+    id: `notice-${i + 1}`,
+    type,
+    title,
+    ...(needsSuitNumber 
+      ? { suitNumber: getSequentialSuitNumber(i) } 
+      : { referenceNumber: getSequentialReferenceNumber(type, i) }
+    ),
+    servedDate: getSequentialDate(i),
+    servedTime: `${(8 - (i % 4)).toString().padStart(2, '0')}:${(15 + (i * 5)).toString().padStart(2, '0')} pm`,
+    court: getRandomCourt(),
+    division: getRandomDivision(),
+    expiryDate: getFutureDate(30 - i),
+    content: getNoticeContent(type, title),
+    signatory: getRandomSignatory(),
+    signatoryTitle: getRandomSignatoryTitle(),
+    bulletinVolume: `${Math.floor(i / 3) + 1}`,
+  };
+
+  // Add parties for substituted service notices
+  if (isSubstitutedService) {
+    notice.parties = {
+      applicant: {
+        name: applicant,
+        type: 'APPLICANT'
+      },
+      respondent: {
+        name: respondent,
+        type: 'RESPONDENT'
+      }
+    };
+  }
+
+  return notice;
+}).sort((a, b) => {
+  // Sort by date and time, most recent first
+  const dateA = new Date(`${a.servedDate}T${a.servedTime.replace(/\s*(am|pm)/i, '')}`);
+  const dateB = new Date(`${b.servedDate}T${b.servedTime.replace(/\s*(am|pm)/i, '')}`);
+  return dateB.getTime() - dateA.getTime();
+}); 

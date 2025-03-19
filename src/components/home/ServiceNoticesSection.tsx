@@ -1,98 +1,26 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { fadeInUp, stagger } from '../../utils/animations';
+import { mockNotices, type Notice } from '@/data/mockNotices';
 
-interface ServiceNotice {
-  id: string;
-  courtName: string;
-  caseTitle: string;
-  suitNumber: string;
-  servedTime: string;
-  servedDate: string;
-  countdown: {
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-  };
-}
-
-// Temporary mock data - this will come from the dashboard later
-const mockNotices: ServiceNotice[] = [
-  {
-    id: '1',
-    courtName: 'High Court (Commercial Division)',
-    caseTitle: 'The Special Prosecutor v. Anthony Gyasi',
-    suitNumber: 'J5/05/2024',
-    servedTime: '4:00 pm',
-    servedDate: '3rd Jan, 2024',
-    countdown: {
-      days: 4,
-      hours: 3,
-      minutes: 4,
-      seconds: 12
-    }
-  },
-  {
-    id: '2',
-    courtName: 'Supreme Court',
-    caseTitle: 'Dom v. The Republic',
-    suitNumber: 'J5/05/2024',
-    servedTime: '5:00 pm',
-    servedDate: '2nd Jan, 2024',
-    countdown: {
-      days: 2,
-      hours: 3,
-      minutes: 4,
-      seconds: 12
-    }
-  },
-  {
-    id: '3',
-    courtName: 'High Court (Commercial Division)',
-    caseTitle: 'The Special Prosecutor v. Anthony Gyasi',
-    suitNumber: 'J5/05/2024',
-    servedTime: '4:00 pm',
-    servedDate: '3rd Jan, 2024',
-    countdown: {
-      days: 4,
-      hours: 3,
-      minutes: 4,
-      seconds: 12
-    }
-  },
-  {
-    id: '4',
-    courtName: 'Supreme Court',
-    caseTitle: 'Dom v. The Republic',
-    suitNumber: 'J5/05/2024',
-    servedTime: '5:00 pm',
-    servedDate: '2nd Jan, 2024',
-    countdown: {
-      days: 2,
-      hours: 3,
-      minutes: 4,
-      seconds: 12
-    }
-  }
-];
-
-// Helper function to format date with superscript
-const formatDateWithSuperscript = (date: string) => {
-  const parts = date.split(' ');
-  const dayWithOrdinal = parts[0];
-  const day = dayWithOrdinal.replace(/\D/g, '');
-  const ordinal = dayWithOrdinal.replace(day, '');
-  
-  return (
-    <>
-      {day}<sup>{ordinal}</sup> {parts[1]} {parts[2]}
-    </>
-  );
+// Helper function to format date
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const month = date.toLocaleString('default', { month: 'long' });
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
 };
 
 const ServiceNoticesSection = () => {
+  // Get the 4 most recent substituted service notices
+  const recentNotices = mockNotices
+    .filter(notice => notice.type === 'SUBSTITUTED_SERVICE_NOTICES')
+    .sort((a, b) => new Date(b.servedDate).getTime() - new Date(a.servedDate).getTime())
+    .slice(0, 4);
+
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
@@ -116,59 +44,65 @@ const ServiceNoticesSection = () => {
           animate="animate"
           viewport={{ once: true }}
         >
-          {mockNotices.map((notice, index) => (
-            <motion.div 
-              key={notice.id} 
-              className="bg-[#F3F5F8] rounded-lg p-4 flex flex-col min-h-[200px] hover:shadow-lg transition-all duration-300"
-              variants={fadeInUp}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.2 }}
+          {recentNotices.map((notice, index) => (
+            <Link 
+              key={notice.id}
+              href={`/notices/${notice.id}`}
+              className="block"
             >
               <motion.div 
-                className="flex-1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 * index }}
+                className="bg-[#F3F5F8] rounded-lg p-4 flex flex-col min-h-[200px] hover:shadow-lg transition-all duration-300 cursor-pointer"
+                variants={fadeInUp}
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.2 }}
               >
                 <motion.div 
-                  className="w-fit"
+                  className="flex-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 * index }}
+                >
+                  <motion.div 
+                    className="w-fit"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="bg-[#C5E0FF] text-[#01292D] text-xs font-medium px-2 py-1 mb-0">
+                      SUBSTITUTED SERVICE NOTICE
+                    </div>
+                    <div className="bg-white text-[#1E1D1D] text-xs font-normal px-2 py-1 mb-5 font-['Inter'] leading-[100%] tracking-[-0.02em]">
+                      {notice.court}{notice.division ? ` (${notice.division})` : ''}
+                    </div>
+                  </motion.div>
+                  <h3 className="text-[#01292D] text-[14px] font-semibold mb-4 h-[40px] line-clamp-2 overflow-hidden">
+                    {notice.title}
+                  </h3>
+                  
+                  <div className="grid grid-cols-[90px_1fr] gap-x-2 mb-1">
+                    <div className="text-[#01292D] text-xs font-medium">Suit number</div>
+                    <div className="text-[#01292D] text-xs font-medium">Served</div>
+                  </div>
+                  <div className="grid grid-cols-[90px_1fr] gap-x-2">
+                    <div className="text-[#01292D] text-xs">{notice.suitNumber}</div>
+                    <div className="text-[#01292D] text-xs">
+                      {notice.servedTime} | {formatDate(notice.servedDate)}
+                    </div>
+                  </div>
+                </motion.div>
+                
+                <motion.div 
+                  className="bg-white rounded p-2 flex items-center mt-4"
                   whileHover={{ scale: 1.02 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <div className="bg-[#C5E0FF] text-[#01292D] text-xs font-medium px-2 py-1 mb-0">
-                    SUBSTITUTED SERVICE NOTICE
-                  </div>
-                  <div className="bg-white text-[#1E1D1D] text-xs font-normal px-2 py-1 mb-5 font-['Inter'] leading-[100%] tracking-[-0.02em]">
-                    {notice.courtName}
-                  </div>
+                  <span className="text-[#F79009] text-xs font-semibold mr-2">Countdown</span>
+                  <span className="text-[#01292D] text-xs font-semibold">
+                    {/* Calculate countdown from expiryDate */}
+                    {Math.ceil((new Date(notice.expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))}days | {new Date(notice.expiryDate).getHours()}hrs | {new Date(notice.expiryDate).getMinutes()}mins | {new Date(notice.expiryDate).getSeconds()}sec
+                  </span>
                 </motion.div>
-                <h3 className="text-[#01292D] text-[14px] font-semibold mb-4 h-[40px] line-clamp-2 overflow-hidden">
-                  {notice.caseTitle}
-                </h3>
-                
-                <div className="grid grid-cols-[90px_1fr] gap-x-2 mb-1">
-                  <div className="text-[#01292D] text-xs font-medium">Suit number</div>
-                  <div className="text-[#01292D] text-xs font-medium">Served</div>
-                </div>
-                <div className="grid grid-cols-[90px_1fr] gap-x-2">
-                  <div className="text-[#01292D] text-xs">{notice.suitNumber}</div>
-                  <div className="text-[#01292D] text-xs">
-                    {notice.servedTime} | {formatDateWithSuperscript(notice.servedDate)}
-                  </div>
-                </div>
               </motion.div>
-              
-              <motion.div 
-                className="bg-white rounded p-2 flex items-center mt-4"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                <span className="text-[#F79009] text-xs font-semibold mr-2">Countdown</span>
-                <span className="text-[#01292D] text-xs font-semibold">
-                  {notice.countdown.days}days | {notice.countdown.hours}hrs | {notice.countdown.minutes}mins | {notice.countdown.seconds}sec
-                </span>
-              </motion.div>
-            </motion.div>
+            </Link>
           ))}
         </motion.div>
       </div>

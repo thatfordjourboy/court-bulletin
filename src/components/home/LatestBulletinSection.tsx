@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { fadeInUp, stagger, slideIn } from '../../utils/animations';
+import { mockNotices } from '@/data/mockNotices';
+import NoticeTypeIcon from '../../components/NoticeTypeIcon';
 
 // This type definition will help with TypeScript when integrating with the backend
 type Bulletin = {
@@ -77,6 +79,36 @@ const LatestBulletinSection = () => {
     return title.toLowerCase().replace(/\s+/g, '-');
   };
 
+  // Get the 4 most recent non-substituted service notices
+  const recentNotices = mockNotices
+    .filter(notice => notice.type !== 'SUBSTITUTED_SERVICE_NOTICES')
+    .sort((a, b) => {
+      // First sort by date
+      const dateComparison = new Date(b.servedDate).getTime() - new Date(a.servedDate).getTime();
+      // If dates are equal, sort by ID to ensure consistent ordering
+      if (dateComparison === 0) {
+        return a.id.localeCompare(b.id);
+      }
+      return dateComparison;
+    })
+    .slice(0, 4);
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  // Truncate content for preview
+  const truncateContent = (content: string, maxLength: number = 150) => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength).trim() + '...';
+  };
+
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
@@ -120,85 +152,92 @@ const LatestBulletinSection = () => {
             animate="animate"
             viewport={{ once: true }}
           >
-            {bulletins.map((bulletin, index) => (
+            {recentNotices.map((notice, index) => (
               <motion.div 
-                key={index} 
-                className={`bg-[#f9fafb] rounded-lg p-6 flex flex-col h-full transition-all duration-300
-                  ${index === 0 ? 'shadow-md hover:shadow-xl' : 'hover:shadow-lg'}`}
+                key={notice.id} 
+                className="bg-[#f9fafb] rounded-lg p-6 flex flex-col h-full transition-all duration-300 hover:shadow-lg"
                 variants={fadeInUp}
                 whileHover={{ y: -5 }}
                 transition={{ duration: 0.2 }}
               >
-                <motion.div 
-                  className="flex justify-between items-center mb-30"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 * index }}
-                >
-                  <motion.span 
-                    className={`text-[#01292D] text-xs font-medium px-3 py-1.5
-                      ${index === 0 ? 'bg-[#64CCC5]' : 'bg-[#FEF9C3]'}`}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    GhCourt Bulletin {bulletin.volume}
-                  </motion.span>
-                  <motion.span 
-                    className="bg-[#DBEAFE] text-[#01292D] text-xs font-medium px-3 py-1.5"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {bulletin.date}
-                  </motion.span>
-                </motion.div>
-                <div className="flex flex-col h-full">
-                  <motion.h3 
-                    className="font-['Inter'] text-[20px] font-semibold leading-[150%] tracking-[-0.01em] text-[#01292D] min-h-[90px]"
-                    style={{ 
-                      fontWeight: 600,
-                      lineHeight: '150%',
-                      letterSpacing: '-0.01em'
-                    }}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 * index }}
-                  >
-                    {bulletin.title}
-                  </motion.h3>
-                  <motion.p 
-                    className="font-['Inter'] text-[14px] font-normal leading-[160%] tracking-[-0.01em] text-[#1E1D1D] mb-8"
-                    style={{ 
-                      fontWeight: 400,
-                      lineHeight: '160%',
-                      letterSpacing: '-0.01em'
-                    }}
+                <Link href={`/notices/${notice.id}`} className="flex flex-col h-full relative">
+                  <motion.div 
+                    className="flex justify-between items-center mb-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 * index }}
+                    transition={{ delay: 0.2 * index }}
                   >
-                    {bulletin.description}
-                  </motion.p>
-                  <motion.div 
-                    className="mt-auto"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 * index }}
-                  >
-                    <Link
-                      href={`/bulletin/${generateSlug(bulletin.title)}`}
-                      className="bg-[#01292D] text-white px-4 py-2 inline-flex items-center group hover:bg-[#71CED1] transition-all duration-300"
+                    <motion.span 
+                      className={`text-[#01292D] text-xs font-medium py-1.5 px-2.5 rounded-sm
+                        ${index === 0 ? 'bg-[#64CCC5]/90' : 'bg-[#FEF9C3]/90'}`}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      <span>Learn more</span>
-                      <motion.span 
-                        className="ml-1"
-                        animate={{ x: [0, 3, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                      >
-                        →
-                      </motion.span>
-                    </Link>
+                      GhCourt Bulletin Vol. {notice.bulletinVolume}
+                    </motion.span>
+                    <motion.span 
+                      className="bg-[#DBEAFE]/90 text-[#01292D] text-xs font-medium px-3 py-1.5 rounded-sm"
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {formatDate(notice.servedDate)}
+                    </motion.span>
                   </motion.div>
-                </div>
+
+                  {/* Featured Notice Type Background */}
+                  <NoticeTypeIcon 
+                    type={notice.type}
+                    className="w-full h-48 mb-6 rounded-lg"
+                  />
+
+                  <div className="flex flex-col flex-1">
+                    <motion.h3 
+                      className="font-['Inter'] text-[20px] font-semibold leading-[150%] tracking-[-0.01em] text-[#01292D] mb-2 line-clamp-2"
+                      style={{ 
+                        fontWeight: 600,
+                        lineHeight: '150%',
+                        letterSpacing: '-0.01em'
+                      }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 * index }}
+                    >
+                      {notice.title}
+                    </motion.h3>
+
+                    <motion.div 
+                      className="font-['Inter'] text-[14px] font-normal leading-[160%] tracking-[-0.01em] text-[#1E1D1D] flex-grow"
+                      style={{ 
+                        fontWeight: 400,
+                        lineHeight: '160%',
+                        letterSpacing: '-0.01em'
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 * index }}
+                    >
+                      {truncateContent(notice.content)}
+                    </motion.div>
+
+                    <motion.div 
+                      className="mt-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 * index }}
+                    >
+                      <div className="bg-[#01292D] text-white px-4 py-2 inline-flex items-center group hover:bg-[#71CED1] transition-all duration-300">
+                        <span>Learn more</span>
+                        <motion.span 
+                          className="ml-1"
+                          animate={{ x: [0, 3, 0] }}
+                          transition={{ repeat: Infinity, duration: 1.5 }}
+                        >
+                          →
+                        </motion.span>
+                      </div>
+                    </motion.div>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </motion.div>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import NoticeFilters from '@/components/notices/NoticeFilters';
 import NoticeCard from '@/components/notices/NoticeCard';
+import SpotlightCarousel from '@/components/notices/SpotlightCarousel';
 import { motion } from 'framer-motion';
 import { fadeInUp, stagger } from '@/utils/animations';
 import { mockNotices, type Notice } from '@/data/mockNotices';
@@ -211,7 +212,7 @@ export default function NoticesPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ghana Bar Association notice to all lawyers"
+                  placeholder="Search by title, suit number etc."
                   className="w-full border border-[#E5E7EB] p-3 pr-12"
                 />
                 <button 
@@ -245,22 +246,25 @@ export default function NoticesPage() {
               initial="initial"
               animate="animate"
             >
-              {currentNotices.map((notice) => (
-                <NoticeCard
-                  key={notice.id}
-                  type={notice.type}
-                  title={notice.title}
-                  suitNumber={notice.suitNumber}
-                  servedDate={notice.servedDate}
-                  servedTime={notice.servedTime}
-                  court={notice.court}
-                  division={notice.division}
-                  expiryDate={notice.expiryDate}
-                />
-              ))}
+              {currentNotices.map((notice) => {
+                console.log('Notice:', notice); // Debug log
+                return (
+                  <NoticeCard
+                    key={notice.id}
+                    id={notice.id}
+                    type={notice.type}
+                    title={notice.title}
+                    suitNumber={notice.suitNumber}
+                    referenceNumber={notice.referenceNumber}
+                    servedDate={notice.servedDate}
+                    servedTime={notice.servedTime}
+                    court={notice.court}
+                    division={notice.division}
+                    expiryDate={notice.expiryDate}
+                  />
+                );
+              })}
             </motion.div>
-
-            {/* Pagination */}
           </div>
         </div>
 
@@ -323,6 +327,11 @@ export default function NoticesPage() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Spotlight Carousel Section */}
+        <div className="mt-16">
+          <SpotlightCarousel />
         </div>
       </div>
     </div>
