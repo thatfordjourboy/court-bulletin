@@ -145,6 +145,8 @@ export default function NoticeFilters({
             dropdownMode="select"
             yearDropdownItemNumber={10}
             scrollableYearDropdown
+            popperClassName="datepicker-popper"
+            portalId="datepicker-portal"
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
             <motion.svg 
@@ -170,6 +172,32 @@ export default function NoticeFilters({
             />
           )}
         </motion.div>
+        <style jsx global>{`
+          .react-datepicker {
+            font-family: Inter, sans-serif;
+            background-color: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 4px;
+            position: relative;
+            z-index: 60 !important;
+          }
+          .react-datepicker-wrapper {
+            width: 100%;
+          }
+          .react-datepicker-popper {
+            z-index: 99999 !important;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          }
+          .datepicker-portal {
+            position: relative;
+            z-index: 99999;
+          }
+          .datepicker-popper {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          }
+        `}</style>
       </div>
 
       {/* Filter by notices */}

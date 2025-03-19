@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import NoticeFilters from '@/components/notices/NoticeFilters';
 import NoticeCard from '@/components/notices/NoticeCard';
 import SpotlightCarousel from '@/components/notices/SpotlightCarousel';
@@ -10,6 +11,9 @@ import { fadeInUp, stagger } from '@/utils/animations';
 import { mockNotices, type Notice } from '@/data/mockNotices';
 
 export default function NoticesPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState<string | null>(null);
   const [noticeTypeFilter, setNoticeTypeFilter] = useState<string | null>(null);
@@ -19,6 +23,110 @@ export default function NoticesPage() {
   const [filteredNotices, setFilteredNotices] = useState<Notice[]>(mockNotices);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  // Handle URL updates
+  const createQueryString = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    // Update or remove parameters based on the updates object
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null) {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    });
+
+    return params.toString();
+  };
+
+  // Initialize filters from URL parameters
+  useEffect(() => {
+    const typeFromUrl = searchParams.get('type');
+    if (typeFromUrl) {
+      const typeMap: { [key: string]: string } = {
+        'substituted-service': 'Substituted Service Notices',
+        'general': 'General Notices',
+        'practice-direction': 'Practice Direction',
+        'estate': 'Estate Notices',
+        'announcements': 'Announcements',
+        'judicial': 'Judicial Notices'
+      };
+      
+      const displayType = typeMap[typeFromUrl];
+      if (displayType) {
+        setNoticeTypeFilter(displayType);
+      }
+    }
+  }, [searchParams]);
+
+  // Filter notices based on all criteria
+  useEffect(() => {
+    let filtered = [...mockNotices];
+
+    // Apply notice type filter
+    if (noticeTypeFilter) {
+      // Convert display format to enum format
+      const typeMap: { [key: string]: string } = {
+        'Substituted Service Notices': 'SUBSTITUTED_SERVICE_NOTICES',
+        'General Notices': 'GENERAL_NOTICES',
+        'Practice Direction': 'PRACTICE_DIRECTION',
+        'Estate Notices': 'ESTATE_NOTICES',
+        'Announcements': 'ANNOUNCEMENTS',
+        'Judicial Notices': 'JUDICIAL_NOTICES'
+      };
+      
+      const typeEnum = typeMap[noticeTypeFilter];
+      if (typeEnum) {
+        filtered = filtered.filter(notice => notice.type === typeEnum);
+      }
+    }
+
+    // Apply court type filter
+    if (courtTypeFilter) {
+      filtered = filtered.filter(notice => 
+        notice.court === courtTypeFilter
+      );
+    }
+
+    // Apply division filter
+    if (divisionFilter) {
+      filtered = filtered.filter(notice => 
+        notice.division === divisionFilter
+      );
+    }
+
+    // Apply date filter
+    if (dateFilter) {
+      filtered = filtered.filter(notice => 
+        notice.servedDate.startsWith(dateFilter)
+      );
+    }
+
+    // Apply search query
+    if (searchQuery) {
+      filtered = filtered.filter(notice =>
+        notice.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        notice.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (notice.suitNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+        (notice.referenceNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
+      );
+    }
+
+    // Apply sorting
+    if (sortBy) {
+      filtered.sort((a, b) => {
+        const dateA = new Date(a.servedDate).getTime();
+        const dateB = new Date(b.servedDate).getTime();
+        if (sortBy === 'newest') return dateB - dateA;
+        if (sortBy === 'oldest') return dateA - dateB;
+        return 0;
+      });
+    }
+
+    setFilteredNotices(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [noticeTypeFilter, courtTypeFilter, divisionFilter, dateFilter, searchQuery, sortBy]);
 
   // Calculate pagination values
   const totalPages = Math.ceil(filteredNotices.length / itemsPerPage);
@@ -88,76 +196,44 @@ export default function NoticesPage() {
     }
   };
 
-  // Filter and sort notices
-  useEffect(() => {
-    let filtered = [...mockNotices];
-
-    // Apply search filter
-    if (searchQuery) {
-      filtered = filtered.filter(notice =>
-        notice.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        notice.court.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        notice.suitNumber.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Apply date filter
-    if (dateFilter) {
-      const filterDate = new Date(dateFilter).toDateString();
-      filtered = filtered.filter(notice => 
-        new Date(notice.servedDate).toDateString() === filterDate
-      );
-    }
-
-    // Apply notice type filter
-    if (noticeTypeFilter) {
-      filtered = filtered.filter(notice => 
-        notice.type === noticeTypeFilter.toUpperCase().replace(/ /g, '_')
-      );
-    }
-
-    // Apply court type filter
-    if (courtTypeFilter) {
-      filtered = filtered.filter(notice => 
-        notice.court === courtTypeFilter
-      );
-
-      // Apply division filter only if High Court is selected
-      if (courtTypeFilter === 'High Court' && divisionFilter) {
-        filtered = filtered.filter(notice => 
-          notice.division === divisionFilter
-        );
-      }
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      if (sortBy === 'newest') {
-        return new Date(b.servedDate).getTime() - new Date(a.servedDate).getTime();
-      } else if (sortBy === 'oldest') {
-        return new Date(a.servedDate).getTime() - new Date(b.servedDate).getTime();
-      }
-      return 0;
-    });
-
-    setFilteredNotices(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Only scroll to top when filters change
-  }, [searchQuery, dateFilter, noticeTypeFilter, courtTypeFilter, divisionFilter, sortBy]);
-
   // Handle search
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Search is handled by the useEffect above
   };
 
+  // Handle reset
   const handleReset = () => {
+    // Clear all filters
     setDateFilter(null);
     setNoticeTypeFilter(null);
     setCourtTypeFilter(null);
     setDivisionFilter(null);
     setSortBy(null);
     setSearchQuery('');
+
+    // Update URL - remove type parameter while preserving other potential parameters
+    const queryString = createQueryString({ type: null });
+    router.push(`${pathname}${queryString ? `?${queryString}` : ''}`);
+  };
+
+  // Handle notice type change
+  const handleNoticeTypeChange = (type: string | null) => {
+    setNoticeTypeFilter(type);
+    
+    // Convert display type to URL parameter format
+    const typeMap: { [key: string]: string } = {
+      'Substituted Service Notices': 'substituted-service',
+      'General Notices': 'general',
+      'Practice Direction': 'practice-direction',
+      'Estate Notices': 'estate',
+      'Announcements': 'announcements',
+      'Judicial Notices': 'judicial'
+    };
+
+    const urlType = type ? typeMap[type] : null;
+    const queryString = createQueryString({ type: urlType });
+    router.push(`${pathname}${queryString ? `?${queryString}` : ''}`);
   };
 
   return (
@@ -190,7 +266,7 @@ export default function NoticesPage() {
           <div className="w-full lg:w-[250px] bg-[#F3F5F8] p-5 lg:sticky lg:top-6 h-fit order-2 lg:order-1">
             <NoticeFilters
               onDateChange={setDateFilter}
-              onNoticeTypeChange={setNoticeTypeFilter}
+              onNoticeTypeChange={handleNoticeTypeChange}
               onCourtTypeChange={setCourtTypeFilter}
               onDivisionChange={setDivisionFilter}
               onSortChange={setSortBy}
