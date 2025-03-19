@@ -100,7 +100,7 @@ export default function NoticeCard({
   return (
     <div className="space-y-3">
       <motion.div 
-        className="bg-[#F3F5F8] p-3 inline-block"
+        className="bg-[#F3F5F8] p-3 w-fit"
         variants={fadeInUp}
       >
         {/* Header section with type and court */}

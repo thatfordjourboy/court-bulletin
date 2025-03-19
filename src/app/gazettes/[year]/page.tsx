@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { gazetteYears } from '@/data/mockGazettes';
@@ -19,16 +19,15 @@ interface MonthGroup {
 }
 
 type PageParams = {
-  params: {
-    year: string;
-  };
+  params: Promise<{ year: string }>;
 }
 
 const tableItemStyles = "font-['Inter'] text-base leading-none text-[#1E1D1D] font-normal";
 
 export default function GazetteYearPage({ params }: PageParams) {
   const router = useRouter();
-  const year = params.year;
+  const resolvedParams = use(params);
+  const year = resolvedParams.year;
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState(year);
   const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'oldest' | null>(null);
@@ -214,7 +213,7 @@ export default function GazetteYearPage({ params }: PageParams) {
           <div className="w-full lg:w-[250px] bg-[#F3F5F8] p-5 flex flex-col lg:sticky lg:top-6 order-2 lg:order-1 h-fit">
             <GazetteFilters
               onYearChange={(year) => {
-                if (year && year !== params.year) {
+                if (year && year !== resolvedParams.year) {
                   router.push(`/gazettes/${year}`);
                 }
               }}

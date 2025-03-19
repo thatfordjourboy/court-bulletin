@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { mockNotices, type Notice } from '@/data/mockNotices';
 import { QRCodeSVG } from 'qrcode.react';
 import { fadeInUp } from '@/utils/animations';
+import NoticeContent from '@/components/notices/NoticeContent';
 
-export default function NoticePage({ params }: { params: { id: string } }) {
+export default function NoticePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [qrUrl, setQrUrl] = useState('');
@@ -20,15 +22,15 @@ export default function NoticePage({ params }: { params: { id: string } }) {
 
   // Set up QR code URL after mount
   useEffect(() => {
-    setQrUrl(`${window.location.origin}/notices/${params.id}`);
-  }, [params.id]);
+    setQrUrl(`${window.location.origin}/notices/${resolvedParams.id}`);
+  }, [resolvedParams.id]);
 
   // Fetch notice data
   useEffect(() => {
     const fetchNotice = () => {
       try {
         // Check if the ID already has the 'notice-' prefix
-        const searchId = params.id.startsWith('notice-') ? params.id : `notice-${params.id}`;
+        const searchId = resolvedParams.id.startsWith('notice-') ? resolvedParams.id : `notice-${resolvedParams.id}`;
         const foundNotice = mockNotices.find(n => n.id === searchId);
         setNotice(foundNotice || null);
       } catch (error) {
@@ -39,7 +41,7 @@ export default function NoticePage({ params }: { params: { id: string } }) {
     };
 
     fetchNotice();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   // Handle countdown timer
   useEffect(() => {
@@ -203,7 +205,7 @@ export default function NoticePage({ params }: { params: { id: string } }) {
                 {notice.type === 'SUBSTITUTED_SERVICE_NOTICES' && (
                   <>
                     <div className="mb-4">
-                      <div className="font-inter text-[18px] font-bold leading-[150%] tracking-[-0.02em] text-[#01292D] w-[198px] h-[27px]">{notice.parties?.applicant.name}</div>
+                      <div className="font-inter text-[18px] font-bold leading-[150%] tracking-[-0.02em] text-[#01292D]">{notice.parties?.applicant.name}</div>
                       <span className="font-inter text-[14px] font-medium leading-none tracking-[-0.02em] text-[#01292D] bg-[#C5E0FF] px-[4px] py-[4px] inline-block">{notice.type === 'SUBSTITUTED_SERVICE_NOTICES' ? 'Applicant' : ''}</span>
                     </div>
                     
@@ -212,7 +214,7 @@ export default function NoticePage({ params }: { params: { id: string } }) {
                     </div>
 
                     <div>
-                      <div className="font-inter text-[18px] font-bold leading-[150%] tracking-[-0.02em] text-[#01292D] w-[198px] h-[27px]">{notice.parties?.respondent.name}</div>
+                      <div className="font-inter text-[18px] font-bold leading-[150%] tracking-[-0.02em] text-[#01292D]">{notice.parties?.respondent.name}</div>
                       <span className="font-inter text-[14px] font-medium leading-none tracking-[-0.02em] text-[#01292D] bg-[#C5E0FF] px-[4px] py-[4px] inline-block">{notice.type === 'SUBSTITUTED_SERVICE_NOTICES' ? 'Respondent' : ''}</span>
                     </div>
                   </>
@@ -233,15 +235,15 @@ export default function NoticePage({ params }: { params: { id: string } }) {
           <div className="w-full h-[1px] bg-[#E5E7EB] my-8" />
 
           {/* Notice type and timing section */}
-          <div className="bg-[#F3F5F8] p-4 flex items-center gap-4">
-            <span className="font-inter font-medium text-[18px] leading-none tracking-[-0.02em] uppercase bg-[#E5F3FF] text-[#0066CC] px-4 py-2">
+          <div className="bg-[#F3F5F8] inline-flex items-center gap-4 p-4">
+            <span className="font-inter font-medium text-[18px] leading-none tracking-[-0.02em] uppercase bg-[#E5F3FF] text-[#0066CC] px-4 py-2 whitespace-nowrap">
               {formatType(notice.type)}
             </span>
-            <div className="text-[#464646]">
+            <div className="text-[#464646] whitespace-nowrap">
               <div className="font-medium">Served</div>
               <div>{notice.servedTime} | {formatDate(notice.servedDate)}</div>
             </div>
-            <div className="inline-flex relative p-[2px] bg-white" style={{
+            <div className="inline-flex relative p-[2px] bg-white shrink-0" style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' fill='none' stroke='%2301292D' stroke-width='2' stroke-dasharray='24 12' stroke-dashoffset='0' stroke-linecap='square'/%3E%3C/svg%3E")`,
               backgroundRepeat: 'no-repeat',
               backgroundSize: '100% 100%'
@@ -255,22 +257,13 @@ export default function NoticePage({ params }: { params: { id: string } }) {
             </div>
           </div>
 
-          {/* Court information */}
-          {notice.division && (
-            <div className="mb-8">
-              <span className="text-[#464646] text-sm bg-white px-3 py-1">
-                {notice.division}
-              </span>
-            </div>
-          )}
-
           {/* Notice content */}
-          <div className="prose max-w-none text-[#464646] text-lg leading-relaxed mb-12 max-w-4xl pt-8">
-            {notice.content}
+          <div className="mb-12 w-full pt-8">
+            <NoticeContent content={notice.content} type={notice.type} />
           </div>
 
           {/* Signature section */}
-          <div className="mt-12 max-w-4xl">
+          <div className="mt-12 w-full">
             <p className="text-[#01292D] font-bold">Sgd: {notice.signatory}</p>
             <p className="text-[#464646]">{notice.signatoryTitle}</p>
           </div>
