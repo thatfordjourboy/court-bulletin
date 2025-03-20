@@ -1,17 +1,11 @@
 import { useState, useEffect } from 'react';
 import { CauseList } from '@/data/mockCauseLists';
+import { causeListService, type CauseListParams } from '@/services/api';
 
-interface UseCauseListsParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  date?: string;
-  courtType?: string;
-  region?: string;
-  archived?: boolean;
-}
+// Keep the existing interface but extend it from CauseListParams
+export interface UseCauseListsParams extends CauseListParams {}
 
-interface UseCauseListsResponse {
+export interface UseCauseListsResponse {
   data: CauseList[];
   isLoading: boolean;
   error: Error | null;
@@ -40,22 +34,16 @@ export function useCauseLists({
         setIsLoading(true);
         setError(null);
 
-        const queryParams = new URLSearchParams({
-          page: page.toString(),
-          limit: limit.toString(),
-          archived: archived.toString(),
-          ...(search && { search }),
-          ...(date && { date }),
-          ...(courtType && { courtType }),
-          ...(region && { region })
+        const result = await causeListService.getCauseLists({
+          page,
+          limit,
+          search,
+          date,
+          courtType,
+          region,
+          archived
         });
 
-        const response = await fetch(`/api/cause-lists?${queryParams}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch cause lists');
-        }
-
-        const result = await response.json();
         setData(result.data);
         setTotal(result.total);
         setTotalPages(result.totalPages);

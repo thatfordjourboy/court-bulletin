@@ -245,6 +245,17 @@ export default function ArchiveFilters({
               portalId="datepicker-portal"
               popperPlacement="bottom-start"
             />
+            <button 
+              onClick={() => document.querySelector<HTMLInputElement>('input[placeholder="Select date"]')?.click()}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#464646] hover:text-[#01292D] transition-colors"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6.66667 1.66667V4.16667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M13.3333 1.66667V4.16667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2.91667 7.57333H17.0833" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path fillRule="evenodd" clipRule="evenodd" d="M15.4167 3.125H4.58333C3.61667 3.125 2.91667 3.825 2.91667 4.79167V15.2083C2.91667 16.175 3.61667 16.875 4.58333 16.875H15.4167C16.3833 16.875 17.0833 16.175 17.0833 15.2083V4.79167C17.0833 3.825 16.3833 3.125 15.4167 3.125Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </motion.div>
         </div>
       </motion.div>

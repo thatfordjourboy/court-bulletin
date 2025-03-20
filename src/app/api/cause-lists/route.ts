@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { mockCauseLists } from '@/data/mockCauseLists';
+import { modernCauseLists } from '@/data/modernCauseLists';
 
 const isArchived = (dateString: string) => {
   const [day, month, year] = dateString.split(' ');
@@ -23,8 +24,11 @@ export async function GET(request: Request) {
   const region = searchParams.get('region') || '';
   const isArchivePage = searchParams.get('archived') === 'true';
 
+  // Combine mock and modern cause lists
+  const allCauseLists = [...mockCauseLists, ...modernCauseLists];
+
   // First filter by archive status
-  let filteredLists = mockCauseLists.filter(list => isArchived(list.date) === isArchivePage);
+  let filteredLists = allCauseLists.filter(list => isArchived(list.date) === isArchivePage);
 
   // Then apply other filters
   if (search) {
