@@ -10,12 +10,12 @@ const ArchiveNavigation = () => {
     return pathname?.startsWith(`/archives/${path}`);
   };
 
-  const linkBaseStyles = "px-4 py-2 transition-colors duration-200 flex items-center gap-2 font-['Inter'] text-[18px] font-bold leading-[100%] tracking-[0%] whitespace-nowrap";
+  const linkBaseStyles = "px-2 sm:px-4 py-2 transition-colors duration-200 flex items-center gap-1 sm:gap-2 font-['Inter'] text-[16px] sm:text-[18px] font-bold leading-[100%] tracking-[0%] whitespace-nowrap";
 
   return (
-    <nav className="w-full bg-[#FFEACB] py-3 mb-6">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center">
+    <nav className="w-full bg-[#FFEACB] py-2 sm:py-3 mb-8">
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
           <Link
             href="/archives/cause-lists"
             className={`${linkBaseStyles} ${

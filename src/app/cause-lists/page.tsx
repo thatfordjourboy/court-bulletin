@@ -40,7 +40,8 @@ export default function CauseListsPage() {
     date: selectedDate,
     courtType: selectedCourtType,
     region: selectedRegion,
-    limit: 8
+    limit: 8,
+    archived: false
   });
 
   // Reset all filters

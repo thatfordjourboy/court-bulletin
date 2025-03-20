@@ -20,6 +20,7 @@ export interface CauseListDetail {
     title: string;
   };
   cases: CauseListCase[];
+  isArchived: boolean;
 }
 
 // Helper function to generate mock cases
@@ -34,19 +35,20 @@ function generateMockCases(courtType: string, count: number = 5): CauseListCase[
   };
 
   const generateSuitNumber = (courtType: string, index: number) => {
+    const currentYear = new Date().getFullYear().toString().slice(-2); // Get last 2 digits of current year
     switch (courtType) {
       case 'Supreme Court':
-        return `J1/${(index + 5).toString().padStart(2, '0')}/2021`;
+        return `J1/${(index + 5).toString().padStart(2, '0')}/${currentYear}`;
       case 'High Court':
-        return `HRCM/${(index + 21).toString().padStart(2, '0')}/21`;
+        return `HRCM/${(index + 21).toString().padStart(2, '0')}/${currentYear}`;
       case 'Court of Appeal':
-        return `H1/${(154 + index).toString()}/2021`;
+        return `H1/${(154 + index).toString()}/${currentYear}`;
       case 'Circuit Court':
-        return `CC/${(index + 1).toString().padStart(3, '0')}/21`;
+        return `CC/${(index + 1).toString().padStart(3, '0')}/${currentYear}`;
       case 'District Court':
-        return `DC/${(index + 1).toString().padStart(3, '0')}/21`;
+        return `DC/${(index + 1).toString().padStart(3, '0')}/${currentYear}`;
       default:
-        return `${index + 1}/2021`;
+        return `${index + 1}/${currentYear}`;
     }
   };
 
@@ -54,8 +56,16 @@ function generateMockCases(courtType: string, count: number = 5): CauseListCase[
   const defendants = ['Bank of Ghana', 'Electoral Commission', 'Lands Commission', 'State Housing Company', 'Ministry of Finance'];
 
   for (let i = 0; i < count; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() + (i % 7)); // Spread cases over a week
+    const formattedDate = date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+
     cases.push({
-      date: `${(i % 7) + 1}-02-21`,
+      date: formattedDate,
       suit: generateSuitNumber(courtType, i),
       caseTitle: `${plaintiffs[i % plaintiffs.length]} v. ${defendants[i % defendants.length]}`,
       particulars: particulars[courtType as keyof typeof particulars][i % particulars[courtType as keyof typeof particulars].length]
@@ -129,16 +139,36 @@ function generateMockData(id: string): CauseListDetail | null {
       break;
   }
 
+  // Determine if the cause list is archived based on the ID pattern
+  const isArchived = id.startsWith('archive-') || rest.includes('archive');
+
+  // Generate date range using current dates
+  const baseDate = new Date();
+  const startDate = new Date(baseDate);
+  const endDate = new Date(baseDate);
+  endDate.setDate(baseDate.getDate() + 6);
+  
+  const dateRange = `${startDate.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })} - ${endDate.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })}`.toUpperCase();
+
   return {
     id,
     courtType: court,
     title,
-    dateRange: '1ST FEB 2021 - 7 FEB 2021',
+    dateRange,
     division: division || undefined,
     location: 'Greater Accra',
     notice: `Notice has been given by the ${court} Registrar of the general sitting${division ? ` of the ${division}` : ''} for hearing cases at ${court} at ${court === 'Supreme Court' ? '9.30am' : '9.00am'}.`,
     registrar: registrars[court as keyof typeof registrars],
-    cases: generateMockCases(court)
+    cases: generateMockCases(court),
+    isArchived
   };
 }
 

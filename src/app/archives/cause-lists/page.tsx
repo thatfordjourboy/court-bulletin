@@ -1,17 +1,48 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ArchiveFilters from '@/components/archives/ArchiveFilters';
 import ArchiveNavigation from '@/components/archives/ArchiveNavigation';
+import { useCauseLists } from '@/hooks/useCauseLists';
+
+// Get background color based on court type
+const getBackgroundColor = (courtType: string) => {
+  switch (courtType) {
+    case 'Supreme Court':
+      return 'bg-[#FFEACB]';
+    case 'High Court':
+      return 'bg-[#C5E0FF]';
+    case 'Court of Appeal':
+      return 'bg-[#FFCDCE]';
+    case 'Circuit Court':
+      return 'bg-[#E8FFE4]';
+    case 'District Court':
+      return 'bg-[#F3E8FF]';
+    default:
+      return 'bg-[#F9FAFB]';
+  }
+};
 
 const ArchiveCauseListsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedCourtType, setSelectedCourtType] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('');
   const [isExplicitSearch, setIsExplicitSearch] = useState(false);
+
+  const { data: causeLists, isLoading, error, total } = useCauseLists({
+    page: currentPage,
+    search: isExplicitSearch ? searchQuery : '',
+    date: selectedDate,
+    courtType: selectedCourtType,
+    region: selectedRegion,
+    limit: 8,
+    archived: true
+  });
 
   // Reset all filters
   const handleReset = () => {
@@ -19,6 +50,7 @@ const ArchiveCauseListsPage = () => {
     setSelectedDate('');
     setSelectedCourtType('');
     setSelectedRegion('');
+    setCurrentPage(1);
   };
 
   return (
@@ -86,80 +118,86 @@ const ArchiveCauseListsPage = () => {
                 
                 {/* Results count */}
                 <div className="text-[#64CCC5] text-sm font-medium mt-3 mb-6">
-                  203 results
+                  {total} results
                 </div>
               </div>
 
-              {/* Archives grid */}
-              <div className="grid grid-cols-1 gap-6">
-                {/* Archive Item */}
-                <div className="bg-[#F8F9FB] flex flex-col">
-                  <div className="p-4">
-                    <div className="h-[100px]">
-                      <h2 className="text-[#01292D] text-[22px] leading-[150%] tracking-[-0.02em] font-bold font-['Inter']">
-                        Supreme Court (Accra Central) Cause List
-                      </h2>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-x-4 mb-4">
-                      <div>
-                        <div className="font-medium text-sm text-[#1E1D1D] mb-2">Location</div>
-                        <div className="text-sm text-[#464646]">Accra</div>
+              {/* Loading state */}
+              {isLoading ? (
+                <div className="flex justify-center items-center min-h-[400px]">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#01292D]"></div>
+                </div>
+              ) : error ? (
+                <div className="text-red-500">Error loading cause lists. Please try again later.</div>
+              ) : (
+                /* Cause Lists grid */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-12 mb-12">
+                  {causeLists.map((causeList) => (
+                    <div key={causeList.id} className="flex flex-col w-full min-h-[300px]">
+                      <div className="bg-[#F8F9FB] w-full flex-1">
+                        <div className="h-[100px] px-4 pt-4">
+                          <h2 className="text-[#01292D] text-[22px] leading-[150%] tracking-[-0.02em] font-bold font-['Inter']">
+                            {causeList.title}
+                          </h2>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-x-4 px-4 pb-4">
+                          {causeList.division ? (
+                            <>
+                              <div>
+                                <div className="font-medium text-sm text-[#1E1D1D] mb-2">Division</div>
+                                <div className="text-sm text-[#464646]">{causeList.division}</div>
+                              </div>
+                              <div>
+                                <div className="font-medium text-sm text-[#1E1D1D] mb-2">Date</div>
+                                <div className="text-sm text-[#464646]">{causeList.date}</div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div>
+                                <div className="font-medium text-sm text-[#1E1D1D] mb-2">Location</div>
+                                <div className="text-sm text-[#464646]">{causeList.location}</div>
+                              </div>
+                              <div>
+                                <div className="font-medium text-sm text-[#1E1D1D] mb-2">Date</div>
+                                <div className="text-sm text-[#464646]">{causeList.date}</div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+
+                        <div className="px-4 pb-4">
+                          <p className="text-sm text-[#464646] line-clamp-3">{causeList.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-medium text-sm text-[#1E1D1D] mb-2">Date</div>
-                        <div className="text-sm text-[#464646]">1st - 5th, February 2021</div>
+
+                      <div className={`w-full ${getBackgroundColor(causeList.courtType)}`}>
+                        <div className="flex items-center gap-2 pt-6">
+                          <Link 
+                            href={`/archives/cause-lists/${causeList.id}/read`}
+                            className="h-9 flex items-center px-3 border border-[#01292D] text-[#01292D] hover:bg-[#01292D] hover:text-white transition-colors text-sm font-semibold"
+                          >
+                            Read online
+                            <svg className="ml-1" width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M13.5 5.5L1.5 5.5M13.5 5.5L9.5 1.5M13.5 5.5L9.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </Link>
+                          <Link 
+                            href={`/archives/cause-lists/${causeList.id}/download`}
+                            className="h-9 flex items-center px-3 bg-[#01292D] text-white hover:bg-[#064E55] transition-colors text-sm font-semibold"
+                          >
+                            Download
+                            <svg className="ml-1" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </Link>
+                        </div>
                       </div>
                     </div>
-
-                    <p className="text-sm text-[#464646] line-clamp-3 mb-4">
-                      Cause list for the general sitting of the Supreme Court for hearing cases at the Supreme Court Building at 9.30am commencing from 1st February, 2021
-                    </p>
-
-                    <div className="flex gap-4">
-                      <button className="h-9 flex items-center px-3 bg-[#FFF8E7] text-[#01292D] hover:bg-[#FFE7B3] transition-colors text-sm font-semibold">
-                        Read online
-                        <svg className="ml-1" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 8.66667V12C12 12.3536 11.8595 12.6928 11.6095 12.9428C11.3594 13.1929 11.0203 13.3333 10.6667 13.3333H4C3.64638 13.3333 3.30724 13.1929 3.05719 12.9428C2.80714 12.6928 2.66667 12.3536 2.66667 12V5.33333C2.66667 4.97971 2.80714 4.64057 3.05719 4.39052C3.30724 4.14048 3.64638 4 4 4H7.33333" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M10 2.66667H13.3333V6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M6.66667 9.33333L13.3333 2.66667" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </button>
-                      <button className="h-9 flex items-center px-3 bg-[#01292D] text-white hover:bg-[#064E55] transition-colors text-sm font-semibold">
-                        Download
-                        <svg className="ml-1" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10M4.66667 6.66667L8 10M8 10L11.3333 6.66667M8 10V2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              </div>
-
-              {/* Pagination */}
-              <div className="mt-8 flex items-center justify-between">
-                <button className="flex items-center gap-2 text-[#01292D] hover:text-[#71CED1]">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Previous
-                </button>
-                <div className="flex items-center gap-2">
-                  <button className="w-8 h-8 flex items-center justify-center bg-[#01292D] text-white">1</button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100">2</button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100">3</button>
-                  <span>...</span>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100">8</button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100">9</button>
-                  <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100">10</button>
-                </div>
-                <button className="flex items-center gap-2 text-[#01292D] hover:text-[#71CED1]">
-                  Next
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>

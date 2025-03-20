@@ -49,8 +49,8 @@ const getRandomDate = () => {
   return `2024-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 };
 
-// Helper function to generate random court
-const getRandomCourt = () => {
+// Helper function to generate deterministic court based on index
+const getRandomCourt = (index: number) => {
   const courts = [
     'High Court',
     'Supreme Court',
@@ -61,22 +61,23 @@ const getRandomCourt = () => {
     'Labour Court',
     'Family Court'
   ];
-  return courts[Math.floor(Math.random() * courts.length)];
+  return courts[index % courts.length];
 };
 
-// Helper function to generate random division
-const getRandomDivision = () => {
+// Helper function to generate deterministic division based on index
+const getRandomDivision = (index: number) => {
   const divisions = [
-    'Commercial Division',
     'Criminal Division',
-    'Civil Division',
-    'Land Division',
-    'Industrial Division',
-    'Probate Division',
-    'Family Division',
-    'Financial Division'
+    'Land Court',
+    'Divorce and Matrimonial Division',
+    'Probate and Administration Division',
+    'Labour Division',
+    'Human Rights Division',
+    'Commercial Division',
+    'Financial Division',
+    'General Jurisdiction'
   ];
-  return Math.random() > 0.5 ? divisions[Math.floor(Math.random() * divisions.length)] : undefined;
+  return divisions[index % divisions.length];
 };
 
 // Helper function to generate random notice type
@@ -92,29 +93,35 @@ const getRandomNoticeType = () => {
   return types[Math.floor(Math.random() * types.length)] as Notice['type'];
 };
 
-// Helper function to get random signatory
-function getRandomSignatory(): string {
+// Helper function to generate deterministic signatory based on index
+const getRandomSignatory = (index: number) => {
   const signatories = [
-    "John Smith",
-    "Emma Johnson",
-    "Michael Brown",
-    "Sarah Wilson",
-    "David Taylor"
+    'Justice Kwame Asante',
+    'Justice Sarah Mensah',
+    'Justice Michael Osei',
+    'Justice Abena Addo',
+    'Justice Kwaku Mensah',
+    'Justice Akua Sarpong',
+    'Justice Kofi Owusu',
+    'Justice Adwoa Boateng'
   ];
-  return signatories[Math.floor(Math.random() * signatories.length)];
-}
+  return signatories[index % signatories.length];
+};
 
-// Helper function to get random signatory title
-function getRandomSignatoryTitle(): string {
+// Helper function to generate deterministic signatory title based on index
+const getRandomSignatoryTitle = (index: number) => {
   const titles = [
-    "Court Registrar",
-    "Deputy Registrar",
-    "Chief Justice's Secretary",
-    "Court Administrator",
-    "Legal Secretary"
+    'Chief Justice',
+    'Justice of the Supreme Court',
+    'Justice of the Court of Appeal',
+    'Justice of the High Court',
+    'Registrar of the Supreme Court',
+    'Registrar of the High Court',
+    'Deputy Registrar',
+    'Assistant Registrar'
   ];
-  return titles[Math.floor(Math.random() * titles.length)];
-}
+  return titles[index % titles.length];
+};
 
 // Helper function to generate random title
 const getRandomTitle = (type: Notice['type']) => {
@@ -158,24 +165,34 @@ const getRandomSuitNumber = () => {
   return `J${Math.floor(Math.random() * 100)}/${new Date().getFullYear()}`;
 };
 
-const getRandomApplicant = () => {
+// Helper function to generate deterministic applicant based on index
+const getRandomApplicant = (index: number) => {
   const applicants = [
-    'The Special Prosecutor',
     'The Attorney General',
-    'The Electoral Commission',
-    'The Ghana Bar Association'
+    'The Ghana Bar Association',
+    'The Judicial Service',
+    'The Ghana Police Service',
+    'The Ministry of Justice',
+    'The Ghana Revenue Authority',
+    'The Bank of Ghana',
+    'The Securities and Exchange Commission'
   ];
-  return applicants[Math.floor(Math.random() * applicants.length)];
+  return applicants[index % applicants.length];
 };
 
-const getRandomRespondent = () => {
+// Helper function to generate deterministic respondent based on index
+const getRandomRespondent = (index: number) => {
   const respondents = [
     'Anthony Gyasi',
-    'John Smith',
     'Mary Johnson',
-    'Samuel Addo'
+    'Kwame Mensah',
+    'Abena Osei',
+    'Kofi Addo',
+    'Sarah Sarpong',
+    'Michael Owusu',
+    'Adwoa Boateng'
   ];
-  return respondents[Math.floor(Math.random() * respondents.length)];
+  return respondents[index % respondents.length];
 };
 
 // Helper function to format notice type for display
@@ -327,8 +344,8 @@ export const mockNotices: Notice[] = Array.from({ length: 60 }, (_, i) => {
   const needsSuitNumber = isSubstitutedService || isEstateNotice;
   
   // For substituted service notices, get applicant and respondent first
-  const applicant = isSubstitutedService ? getRandomApplicant() : '';
-  const respondent = isSubstitutedService ? getRandomRespondent() : '';
+  const applicant = isSubstitutedService ? getRandomApplicant(i) : '';
+  const respondent = isSubstitutedService ? getRandomRespondent(i) : '';
   
   // Set title based on notice type using consistent titles
   const title = isSubstitutedService ? 
@@ -346,12 +363,12 @@ export const mockNotices: Notice[] = Array.from({ length: 60 }, (_, i) => {
     ),
     servedDate: getSequentialDate(i),
     servedTime: `${(8 - (i % 4)).toString().padStart(2, '0')}:${(15 + (i * 5)).toString().padStart(2, '0')} pm`,
-    court: getRandomCourt(),
-    division: getRandomDivision(),
+    court: getRandomCourt(i),
+    division: getRandomDivision(i),
     expiryDate: getFutureDate(30 - i),
     content: getNoticeContent(type, title),
-    signatory: getRandomSignatory(),
-    signatoryTitle: getRandomSignatoryTitle(),
+    signatory: getRandomSignatory(i),
+    signatoryTitle: getRandomSignatoryTitle(i),
     bulletinVolume: `${Math.floor(i / 3) + 1}`,
   };
 

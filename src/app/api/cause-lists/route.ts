@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
 import { mockCauseLists } from '@/data/mockCauseLists';
 
+const isArchived = (dateString: string) => {
+  const [day, month, year] = dateString.split(' ');
+  const date = new Date(
+    parseInt(year),
+    new Date(Date.parse(month + " 1, " + year)).getMonth(),
+    parseInt(day)
+  );
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  return date < oneYearAgo;
+};
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page') || '1');
@@ -9,10 +21,12 @@ export async function GET(request: Request) {
   const date = searchParams.get('date') || '';
   const courtType = searchParams.get('courtType') || '';
   const region = searchParams.get('region') || '';
+  const isArchivePage = searchParams.get('archived') === 'true';
 
-  // Filter the cause lists based on search criteria
-  let filteredLists = [...mockCauseLists];
+  // First filter by archive status
+  let filteredLists = mockCauseLists.filter(list => isArchived(list.date) === isArchivePage);
 
+  // Then apply other filters
   if (search) {
     const searchLower = search.toLowerCase();
     filteredLists = filteredLists.filter(list => 

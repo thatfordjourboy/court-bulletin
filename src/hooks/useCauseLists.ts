@@ -8,6 +8,7 @@ interface UseCauseListsParams {
   date?: string;
   courtType?: string;
   region?: string;
+  archived?: boolean;
 }
 
 interface UseCauseListsResponse {
@@ -24,7 +25,8 @@ export function useCauseLists({
   search = '',
   date = '',
   courtType = '',
-  region = ''
+  region = '',
+  archived = false
 }: UseCauseListsParams): UseCauseListsResponse {
   const [data, setData] = useState<CauseList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +43,7 @@ export function useCauseLists({
         const queryParams = new URLSearchParams({
           page: page.toString(),
           limit: limit.toString(),
+          archived: archived.toString(),
           ...(search && { search }),
           ...(date && { date }),
           ...(courtType && { courtType }),
@@ -64,7 +67,7 @@ export function useCauseLists({
     };
 
     fetchCauseLists();
-  }, [page, limit, search, date, courtType, region]);
+  }, [page, limit, search, date, courtType, region, archived]);
 
   return { data, isLoading, error, total, totalPages };
 } 
