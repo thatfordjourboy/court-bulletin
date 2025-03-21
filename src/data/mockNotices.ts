@@ -1,36 +1,16 @@
-export interface Notice {
-  id: string;
-  type: 'GENERAL_NOTICES' | 'JUDICIAL_NOTICES' | 'PRACTICE_DIRECTION' | 'SUBSTITUTED_SERVICE_NOTICES' | 'ESTATE_NOTICES' | 'ANNOUNCEMENTS';
-  title: string;
-  suitNumber?: string; // Optional, only for SUBSTITUTED_SERVICE_NOTICES and ESTATE_NOTICES
-  referenceNumber?: string; // Optional, for all other notice types
-  servedDate: string;
-  servedTime: string;
-  court: string;
-  division?: string;
-  expiryDate: string;
-  content: string;
-  signatory: string;
-  signatoryTitle: string;
-  bulletinVolume: string;
-  // Additional fields for Substituted Service Notices
-  parties?: {
-    applicant: {
-      name: string;
-      type: string;
-    };
-    respondent: {
-      name: string;
-      type: string;
-    };
-  };
-  orderImages?: string[]; // Array of image URLs for the order documents
-}
+import { Notice, NoticeType } from '@/types/notice';
 
 // Helper function to generate future date
 const getFutureDate = (days: number) => {
   const date = new Date();
   date.setDate(date.getDate() + days);
+  return date.toISOString();
+};
+
+// Helper function to generate old date (more than 1 year ago)
+const getOldDate = (yearOffset: number = 1) => {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() - yearOffset);
   return date.toISOString();
 };
 
@@ -210,49 +190,12 @@ const formatNoticeType = (type: Notice['type']) => {
 };
 
 // Helper function to get content based on notice type
-const getNoticeContent = (type: Notice['type'], title: string) => {
-  if (type === 'PRACTICE_DIRECTION' && title.toLowerCase().includes('virtual court')) {
-    return `A DIRECTION to provide for protocols in virtual court hearings and to provide for efficient management of the remote/virtual hearing proceedings and related matters.
-
-Being guided by the provisions of Article 125 (4) of the Constitution, 1992, Section 69 (1) of the Courts Act 1993 Act 459 and Orders 38 Rule 3A and 41 Rule 2A of the High Court (Civil Procedure) Rules, 2004 (C.I. 47) as amended by C.I. 87 of 2014, I direct that until statutory provisions are made, the remote/virtual hearing of cases in all Courts in the Country shall be governed as follows:
-
-A. GENERAL
-
-1. The faces of all participants in virtual court hearing MUST be visible and ensure that the face is not turned towards a source of light. Participants must properly position cameras for clarity of image. As much as possible use a plain background.
-2. All participants MUST mute microphones to minimize and conceal any background noise.
-3. No participant can eat or drink while in a virtual session.
-4. In order to minimize distractions and disruptions during the court sessions, all participants MUST raise their hands when they need to speak or use the Chat Box. Raising of hands is enabled by selecting the "Show Reactions" button/bar at the bottom of the screen in the meeting controls and then selecting "Raise Hand".
-5. Applications and Affidavits must be filed with a skeletal brief of the legal arguments and authorities to be presented to the Court. Judges are to allocate not more than 5 - 7 minutes to any participant who wishes to highlight any important point. This is to avoid the time spent on viva voce arguments and reduce the waiting time for other participants.
-
-B. TECHNICAL
-
-1. The virtual court hyperlink for every court shall be displayed on the website of the Judicial Service of Ghana in compliance with Order 1 Rule 2(1) of CI 47. The hyperlink for a particular court shall cease to be accessible except for the records of the court.
-2. Access to audio recordings shall be restricted subject to statutory requirements and the rules of procedure. Any request for audio transcripts for a court sitting MUST be made within a period of 90 days. and subject to the rules of court stored for Back up procedures for audio and text transcripts for each court sitting shall be implemented to ensure that the data is stored for no less than 90 days.
-3. The Judicial Service of Ghana shall maintain a backup system that shall be located and maintained in the place as the Chief Justice shall determine.
-4. Microsoft Teams is the official medium of conducting the virtual sessions. Covering device must be fully charged and have internet connectivity.
-5. All participants MUST ensure they have strong internet connectivity.
-6. All participants MUST endeavor to have uninterrupted power back-up at all material times during a virtual session. Back-up may include generator, UPS, power banks etc.
-7. All participants MUST endeavor to have uninterrupted internet supply at all material times during a virtual session. This may include modems, Wi- Fi and data bundles.
-8. The use of headsets is recommended to increase both privacy and audibility of participants.`;
-  }
-  
-  if (type === 'SUBSTITUTED_SERVICE_NOTICES') {
+const getNoticeContent = (type: NoticeType, title: string) => {
+  if (type === NoticeType.SUBSTITUTED_SERVICE_NOTICES) {
     return `IT IS HEREBY ORDERED that; the order for Confirmation of seizure of suspected tainted property with the accompanying affidavit in support and annexures be served on the Defendant by Substituted Service in the following manner for a period of 7 days. a. By posting a copy of the said Application for an Order of Confirmation of seizure of suspected tainted property with the accompanying affidavit in support and annexures together with a copy the Order for Substituted Service on the Notice Board of the High Court, General Jurisdiction Division. b. By delivering the said application with its accompanying affidavit in support and annexures together with the copy of the Order by Substituted Service to any adult person living at the last known residence of the Respondent; c. By publishing a copy of the said application with its accompanying affidavit in support and annexures together with a copy of the Order for Substituted Service on the Applicant's official website.`;
   }
 
-  if (type === 'PRACTICE_DIRECTION') {
-    return `A DIRECTION to provide guidelines for ${title.toLowerCase()}.
-
-Being guided by the provisions of Article 125 (4) of the Constitution, 1992, and Section 69 (1) of the Courts Act 1993 Act 459, the following directions are hereby issued:
-
-1. All legal practitioners and court users are required to comply with these guidelines.
-2. These guidelines shall come into effect immediately.
-3. Non-compliance with these guidelines may result in appropriate sanctions.
-4. The Registrar shall ensure proper dissemination of these guidelines.`;
-  }
-
-  // Default content for other notice types
-  return "It is notified for lawyers that the mandatory requirement under Regulation 84 of the Legal Profession (Professional Conduct and Etiquette) Rules, 2020 (L.I. 2423) directing lawyers to show proof of Continuous Legal Education (CLE) participation for Solicitors Licence renewal will come into effect in 2024. Hence applications for 2025 Solicitors Licenses will consider CLE Hours earned in 2024.";
+  return 'Notice is hereby given that an application for Letters of Administration has been filed in respect of the estate of the deceased.';
 };
 
 // Helper function to generate sequential dates for substituted service notices
@@ -328,68 +271,179 @@ const getSequentialSuitNumber = (index: number) => {
 };
 
 // Generate mock notices
-export const mockNotices: Notice[] = Array.from({ length: 60 }, (_, i) => {
-  // Use consistent notice types based on index
-  const types: Notice['type'][] = [
-    'PRACTICE_DIRECTION',
-    'JUDICIAL_NOTICES',
-    'GENERAL_NOTICES',
-    'ANNOUNCEMENTS',
-    'ESTATE_NOTICES',
-    'SUBSTITUTED_SERVICE_NOTICES'
-  ];
-  const type = types[i % types.length];
-  const isSubstitutedService = type === 'SUBSTITUTED_SERVICE_NOTICES';
-  const isEstateNotice = type === 'ESTATE_NOTICES';
-  const needsSuitNumber = isSubstitutedService || isEstateNotice;
-  
-  // For substituted service notices, get applicant and respondent first
-  const applicant = isSubstitutedService ? getRandomApplicant(i) : '';
-  const respondent = isSubstitutedService ? getRandomRespondent(i) : '';
-  
-  // Set title based on notice type using consistent titles
-  const title = isSubstitutedService ? 
-    `${applicant} v. ${respondent}` : 
-    getConsistentTitle(type, Math.floor(i / 6));
-
-  // Base notice object
-  const notice: Notice = {
-    id: `notice-${i + 1}`,
-    type,
-    title,
-    ...(needsSuitNumber 
-      ? { suitNumber: getSequentialSuitNumber(i) } 
-      : { referenceNumber: getSequentialReferenceNumber(type, i) }
-    ),
-    servedDate: getSequentialDate(i),
-    servedTime: `${(8 - (i % 4)).toString().padStart(2, '0')}:${(15 + (i * 5)).toString().padStart(2, '0')} pm`,
-    court: getRandomCourt(i),
-    division: getRandomDivision(i),
-    expiryDate: getFutureDate(30 - i),
-    content: getNoticeContent(type, title),
-    signatory: getRandomSignatory(i),
-    signatoryTitle: getRandomSignatoryTitle(i),
-    bulletinVolume: `${Math.floor(i / 3) + 1}`,
-  };
-
-  // Add parties for substituted service notices
-  if (isSubstitutedService) {
-    notice.parties = {
+export const mockNotices: Notice[] = [
+  // Recent notices (less than 1 year old)
+  {
+    id: '1',
+    type: NoticeType.SUBSTITUTED_SERVICE_NOTICES,
+    title: 'The Republic v. Anthony Gyasi',
+    suitNumber: 'J45/2024',
+    referenceNumber: 'SSN-2024-001',
+    servedDate: '2024-03-15',
+    servedTime: '10:30 am',
+    court: 'High Court',
+    division: 'General Jurisdiction',
+    expiryDate: '2024-04-15',
+    content: getNoticeContent(NoticeType.SUBSTITUTED_SERVICE_NOTICES, ''),
+    signatory: 'Justice Kwame Asante',
+    signatoryTitle: 'Justice of the High Court',
+    bulletinVolume: 'Vol. 1',
+    parties: {
       applicant: {
-        name: applicant,
-        type: 'APPLICANT'
+        name: 'The Republic',
+        type: 'Plaintiff'
       },
       respondent: {
-        name: respondent,
-        type: 'RESPONDENT'
+        name: 'Anthony Gyasi',
+        type: 'Defendant'
       }
-    };
-  }
+    }
+  },
+  {
+    id: '2',
+    type: NoticeType.ESTATE_NOTICES,
+    title: 'Estate of Mary Johnson',
+    suitNumber: 'J46/2024',
+    referenceNumber: 'EN-2024-001',
+    servedDate: '2024-03-10',
+    servedTime: '2:15 pm',
+    court: 'High Court',
+    division: 'Probate and Administration Division',
+    expiryDate: '2024-04-10',
+    content: getNoticeContent(NoticeType.ESTATE_NOTICES, ''),
+    signatory: 'Justice Sarah Mensah',
+    signatoryTitle: 'Justice of the High Court',
+    bulletinVolume: 'Vol. 1'
+  },
 
-  return notice;
-}).sort((a, b) => {
-  // Sort by date and time, most recent first
-  const dateA = new Date(`${a.servedDate}T${a.servedTime.replace(/\s*(am|pm)/i, '')}`);
-  const dateB = new Date(`${b.servedDate}T${b.servedTime.replace(/\s*(am|pm)/i, '')}`);
-  return dateB.getTime() - dateA.getTime();
-}); 
+  // Archived notices (older than 1 year)
+  {
+    id: '3',
+    type: NoticeType.SUBSTITUTED_SERVICE_NOTICES,
+    title: 'Ghana Revenue Authority v. Pacific Industries Ltd',
+    suitNumber: 'J45/2023',
+    referenceNumber: 'SSN-2023-001',
+    servedDate: getOldDate(1),
+    servedTime: '11:00 am',
+    court: 'High Court',
+    division: 'Commercial Division',
+    expiryDate: getFutureDate(30),
+    content: getNoticeContent(NoticeType.SUBSTITUTED_SERVICE_NOTICES, ''),
+    signatory: 'Justice Michael Osei',
+    signatoryTitle: 'Justice of the High Court',
+    bulletinVolume: 'Vol. 1',
+    parties: {
+      applicant: {
+        name: 'Ghana Revenue Authority',
+        type: 'Plaintiff'
+      },
+      respondent: {
+        name: 'Pacific Industries Ltd',
+        type: 'Defendant'
+      }
+    }
+  },
+  {
+    id: '4',
+    type: NoticeType.ESTATE_NOTICES,
+    title: 'Estate of Kwame Mensah',
+    suitNumber: 'J46/2023',
+    referenceNumber: 'EN-2023-001',
+    servedDate: getOldDate(1),
+    servedTime: '3:30 pm',
+    court: 'High Court',
+    division: 'Probate and Administration Division',
+    expiryDate: getFutureDate(30),
+    content: getNoticeContent(NoticeType.ESTATE_NOTICES, ''),
+    signatory: 'Justice Abena Addo',
+    signatoryTitle: 'Justice of the High Court',
+    bulletinVolume: 'Vol. 1'
+  },
+  {
+    id: '5',
+    type: NoticeType.SUBSTITUTED_SERVICE_NOTICES,
+    title: 'Bank of Ghana v. Sunrise Enterprises',
+    suitNumber: 'J45/2022',
+    referenceNumber: 'SSN-2022-001',
+    servedDate: getOldDate(2),
+    servedTime: '9:15 am',
+    court: 'High Court',
+    division: 'Commercial Division',
+    expiryDate: getFutureDate(30),
+    content: getNoticeContent(NoticeType.SUBSTITUTED_SERVICE_NOTICES, ''),
+    signatory: 'Justice Kwaku Mensah',
+    signatoryTitle: 'Justice of the High Court',
+    bulletinVolume: 'Vol. 1',
+    parties: {
+      applicant: {
+        name: 'Bank of Ghana',
+        type: 'Plaintiff'
+      },
+      respondent: {
+        name: 'Sunrise Enterprises',
+        type: 'Defendant'
+      }
+    }
+  },
+  {
+    id: '6',
+    type: NoticeType.ESTATE_NOTICES,
+    title: 'Estate of Abena Osei',
+    suitNumber: 'J46/2022',
+    referenceNumber: 'EN-2022-001',
+    servedDate: getOldDate(2),
+    servedTime: '1:45 pm',
+    court: 'High Court',
+    division: 'Probate and Administration Division',
+    expiryDate: getFutureDate(30),
+    content: getNoticeContent(NoticeType.ESTATE_NOTICES, ''),
+    signatory: 'Justice Akua Sarpong',
+    signatoryTitle: 'Justice of the High Court',
+    bulletinVolume: 'Vol. 1'
+  },
+
+  // Additional 30 mock notices for archive testing
+  ...Array(30).fill(null).map((_, index) => {
+    const type = index % 2 === 0 ? NoticeType.SUBSTITUTED_SERVICE_NOTICES : NoticeType.ESTATE_NOTICES;
+    const yearOffset = Math.floor(Math.random() * 2) + 2; // 2-3 years ago
+    const baseDate = new Date();
+    baseDate.setFullYear(baseDate.getFullYear() - yearOffset);
+    baseDate.setDate(baseDate.getDate() - (index * 7)); // Each notice 1 week apart
+    
+    return {
+      id: `notice-archive-${index + 1}`,
+      type,
+      title: type === NoticeType.SUBSTITUTED_SERVICE_NOTICES
+        ? `${getRandomApplicant(index)} v. ${getRandomRespondent(index)}`
+        : `Estate of ${getRandomRespondent(index)}`,
+      suitNumber: type === NoticeType.SUBSTITUTED_SERVICE_NOTICES ? getRandomSuitNumber() : undefined,
+      referenceNumber: type === NoticeType.ESTATE_NOTICES ? `EN${Math.floor(Math.random() * 1000)}/${baseDate.getFullYear()}` : undefined,
+      servedDate: baseDate.toISOString().split('T')[0],
+      servedTime: getRandomTime(),
+      court: getRandomCourt(index),
+      division: getRandomDivision(index),
+      expiryDate: (() => {
+        const expiry = new Date(baseDate);
+        expiry.setDate(expiry.getDate() + 30);
+        return expiry.toISOString().split('T')[0];
+      })(),
+      content: getNoticeContent(type, ''),
+      signatory: getRandomSignatory(index),
+      signatoryTitle: getRandomSignatoryTitle(index),
+      bulletinVolume: `Vol. ${Math.floor(yearOffset)}`,
+      parties: type === NoticeType.SUBSTITUTED_SERVICE_NOTICES ? {
+        applicant: {
+          name: getRandomApplicant(index),
+          type: 'APPLICANT'
+        },
+        respondent: {
+          name: getRandomRespondent(index),
+          type: 'RESPONDENT'
+        }
+      } : undefined
+    };
+  })
+];
+
+// Sort notices by date (most recent first)
+mockNotices.sort((a, b) => new Date(b.servedDate).getTime() - new Date(a.servedDate).getTime()); 

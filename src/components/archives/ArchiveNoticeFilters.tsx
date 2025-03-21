@@ -7,9 +7,13 @@ import { motion } from 'framer-motion';
 
 interface ArchiveNoticeFiltersProps {
   onDateChange: (date: string | null) => void;
+  onTypeChange: (type: string | null) => void;
+  onCourtChange: (court: string | null) => void;
   onReset: () => void;
   onApplyFilters: () => void;
   selectedDate: string | null;
+  selectedType: string | null;
+  selectedCourt: string | null;
 }
 
 const itemVariants = {
@@ -35,9 +39,13 @@ const buttonVariants = {
 
 export default function ArchiveNoticeFilters({
   onDateChange,
+  onTypeChange,
+  onCourtChange,
   onReset,
   onApplyFilters,
   selectedDate,
+  selectedType,
+  selectedCourt,
 }: ArchiveNoticeFiltersProps) {
   const [date, setDate] = useState<Date | null>(selectedDate ? new Date(selectedDate) : null);
 
@@ -118,7 +126,12 @@ export default function ArchiveNoticeFilters({
             initial="initial"
             whileHover="hover"
             whileTap="tap"
-            className="relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden"
+            onClick={() => onTypeChange(selectedType === 'SUBSTITUTED_SERVICE_NOTICES' ? null : 'SUBSTITUTED_SERVICE_NOTICES')}
+            className={`relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] ${
+              selectedType === 'SUBSTITUTED_SERVICE_NOTICES' 
+                ? 'text-[#01292D] bg-[#64CCC5] bg-opacity-10 border-[#64CCC5]' 
+                : 'text-[#464646] bg-white border-[#E5E7EB]'
+            } border transition-all duration-200 rounded-sm overflow-hidden`}
           >
             <span className="relative z-10">Substituted Service Notices</span>
           </motion.button>
@@ -127,7 +140,12 @@ export default function ArchiveNoticeFilters({
             initial="initial"
             whileHover="hover"
             whileTap="tap"
-            className="relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden"
+            onClick={() => onTypeChange(selectedType === 'ESTATE_NOTICES' ? null : 'ESTATE_NOTICES')}
+            className={`relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] ${
+              selectedType === 'ESTATE_NOTICES'
+                ? 'text-[#01292D] bg-[#64CCC5] bg-opacity-10 border-[#64CCC5]'
+                : 'text-[#464646] bg-white border-[#E5E7EB]'
+            } border transition-all duration-200 rounded-sm overflow-hidden`}
           >
             <span className="relative z-10">Estate Notices</span>
           </motion.button>
@@ -138,51 +156,23 @@ export default function ArchiveNoticeFilters({
       <div className="pb-4 mb-4 border-b-[3px] border-[#01292D] border-opacity-20">
         <h3 className="text-[#1E1D1D] text-[16px] font-medium mb-3">Filter by court</h3>
         <div className="flex flex-col gap-1.5">
-          <motion.button
-            variants={buttonVariants}
-            initial="initial"
-            whileHover="hover"
-            whileTap="tap"
-            className="relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden"
-          >
-            <span className="relative z-10">Supreme Court</span>
-          </motion.button>
-          <motion.button
-            variants={buttonVariants}
-            initial="initial"
-            whileHover="hover"
-            whileTap="tap"
-            className="relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden"
-          >
-            <span className="relative z-10">High Court</span>
-          </motion.button>
-          <motion.button
-            variants={buttonVariants}
-            initial="initial"
-            whileHover="hover"
-            whileTap="tap"
-            className="relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden"
-          >
-            <span className="relative z-10">Court of Appeal</span>
-          </motion.button>
-          <motion.button
-            variants={buttonVariants}
-            initial="initial"
-            whileHover="hover"
-            whileTap="tap"
-            className="relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden"
-          >
-            <span className="relative z-10">Circuit Court</span>
-          </motion.button>
-          <motion.button
-            variants={buttonVariants}
-            initial="initial"
-            whileHover="hover"
-            whileTap="tap"
-            className="relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] text-[#464646] bg-white border border-[#E5E7EB] transition-all duration-200 rounded-sm overflow-hidden"
-          >
-            <span className="relative z-10">District Court</span>
-          </motion.button>
+          {['Supreme Court', 'High Court', 'Court of Appeal', 'Circuit Court', 'District Court'].map((court) => (
+            <motion.button
+              key={court}
+              variants={buttonVariants}
+              initial="initial"
+              whileHover="hover"
+              whileTap="tap"
+              onClick={() => onCourtChange(selectedCourt === court ? null : court)}
+              className={`relative w-full h-[34px] text-left px-2.5 flex items-center text-[13px] leading-[100%] tracking-[0%] font-normal font-['Inter'] ${
+                selectedCourt === court
+                  ? 'text-[#01292D] bg-[#64CCC5] bg-opacity-10 border-[#64CCC5]'
+                  : 'text-[#464646] bg-white border-[#E5E7EB]'
+              } border transition-all duration-200 rounded-sm overflow-hidden`}
+            >
+              <span className="relative z-10">{court}</span>
+            </motion.button>
+          ))}
         </div>
       </div>
 

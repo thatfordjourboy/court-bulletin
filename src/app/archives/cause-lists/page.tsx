@@ -62,7 +62,7 @@ const ArchiveCauseListsPage = () => {
           
           <div className="flex gap-32">
             {/* Sidebar */}
-            <div className="w-[240px] shrink-0">
+            <div className="w-[240px] shrink-0 bg-[#F3F5F8] p-5 lg:sticky lg:top-6 h-fit">
               <ArchiveFilters
                 onDateChange={setSelectedDate}
                 onCourtTypeChange={setSelectedCourtType}
