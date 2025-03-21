@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Announcement } from '@/data/mockAnnouncements';
+import { NoticeType } from '@/types/notice';
 
 interface UseAnnouncementsParams {
   page?: number;
   limit?: number;
   search?: string;
   date?: string;
-  type?: string;
+  type?: NoticeType | string;
+  court?: string;
   archived?: boolean;
 }
 
@@ -23,6 +25,7 @@ export function useAnnouncements({
   search = '',
   date = '',
   type = '',
+  court = '',
   archived = false
 }: UseAnnouncementsParams = {}): UseAnnouncementsResult {
   const [data, setData] = useState<Announcement[]>([]);
@@ -43,6 +46,7 @@ export function useAnnouncements({
         if (search) params.append('search', search);
         if (date) params.append('date', date);
         if (type) params.append('type', type);
+        if (court) params.append('court', court);
 
         const response = await fetch(`/api/announcements?${params}`);
         if (!response.ok) throw new Error('Failed to fetch announcements');
@@ -61,7 +65,7 @@ export function useAnnouncements({
     };
 
     fetchAnnouncements();
-  }, [page, limit, search, date, type, archived]);
+  }, [page, limit, search, date, type, court, archived]);
 
   return { data, isLoading, error, total };
 } 

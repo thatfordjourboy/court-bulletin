@@ -21,6 +21,7 @@ export async function GET(request: Request) {
   const search = searchParams.get('search') || '';
   const date = searchParams.get('date') || '';
   const type = searchParams.get('type') || '';
+  const court = searchParams.get('court') || '';
   const isArchivePage = searchParams.get('archived') === 'true';
 
   // First filter by archive status
@@ -47,6 +48,12 @@ export async function GET(request: Request) {
   if (type) {
     filteredAnnouncements = filteredAnnouncements.filter(announcement => 
       announcement.type === type
+    );
+  }
+
+  if (court) {
+    filteredAnnouncements = filteredAnnouncements.filter(announcement => 
+      announcement.court === court
     );
   }
 

@@ -8,7 +8,7 @@ import ArchiveNoticeFilters from '@/components/archives/ArchiveNoticeFilters';
 import NoticeCard from '@/components/notices/NoticeCard';
 import Pagination from '@/components/gazettes/Pagination';
 import { mockNotices } from '@/data/mockNotices';
-import { Notice } from '@/types/notice';
+import { Notice, NoticeType } from '@/types/notice';
 import { motion } from 'framer-motion';
 import { stagger } from '@/utils/animations';
 
@@ -32,7 +32,7 @@ export default function ArchiveNoticesPage() {
       if (servedDate > oneYearAgo) return false;
 
       // Only show Substituted Service and Estate notices
-      if (notice.type !== 'SUBSTITUTED_SERVICE_NOTICES' && notice.type !== 'ESTATE_NOTICES') {
+      if (notice.type !== NoticeType.SUBSTITUTED_SERVICE_NOTICES && notice.type !== NoticeType.ESTATE_NOTICES) {
         return false;
       }
 
@@ -44,7 +44,9 @@ export default function ArchiveNoticesPage() {
           notice.suitNumber?.toLowerCase().includes(searchLower) ||
           notice.referenceNumber?.toLowerCase().includes(searchLower) ||
           notice.court.toLowerCase().includes(searchLower) ||
-          notice.division?.toLowerCase().includes(searchLower);
+          notice.division?.toLowerCase().includes(searchLower) ||
+          notice.parties?.applicant.name.toLowerCase().includes(searchLower) ||
+          notice.parties?.respondent.name.toLowerCase().includes(searchLower);
         if (!matchesSearch) return false;
       }
 
@@ -52,14 +54,24 @@ export default function ArchiveNoticesPage() {
       if (selectedDate) {
         const filterDate = new Date(selectedDate);
         const noticeDate = new Date(notice.servedDate);
-        if (filterDate.toDateString() !== noticeDate.toDateString()) return false;
+        if (
+          filterDate.getFullYear() !== noticeDate.getFullYear() ||
+          filterDate.getMonth() !== noticeDate.getMonth() ||
+          filterDate.getDate() !== noticeDate.getDate()
+        ) {
+          return false;
+        }
       }
 
       // Apply type filter
-      if (selectedType && notice.type !== selectedType) return false;
+      if (selectedType && notice.type !== selectedType) {
+        return false;
+      }
 
       // Apply court filter
-      if (selectedCourt && notice.court !== selectedCourt) return false;
+      if (selectedCourt && notice.court !== selectedCourt) {
+        return false;
+      }
 
       return true;
     });
@@ -83,12 +95,37 @@ export default function ArchiveNoticesPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Handle date change
+  const handleDateChange = (date: string | null) => {
+    setSelectedDate(date);
+    setCurrentPage(1);
+  };
+
+  // Handle type change
+  const handleTypeChange = (type: string | null) => {
+    setSelectedType(type);
+    setCurrentPage(1);
+  };
+
+  // Handle court change
+  const handleCourtChange = (court: string | null) => {
+    setSelectedCourt(court);
+    setCurrentPage(1);
+  };
+
   // Reset all filters
   const handleReset = () => {
     setSearchQuery('');
     setSelectedDate(null);
     setSelectedType(null);
     setSelectedCourt(null);
+    setCurrentPage(1);
+    setIsExplicitSearch(false);
+  };
+
+  // Apply filters
+  const handleApplyFilters = () => {
+    setIsExplicitSearch(true);
     setCurrentPage(1);
   };
 
@@ -103,11 +140,11 @@ export default function ArchiveNoticesPage() {
             {/* Sidebar */}
             <div className="w-[250px] shrink-0 bg-[#F3F5F8] p-5 lg:sticky lg:top-6 h-fit">
               <ArchiveNoticeFilters
-                onDateChange={setSelectedDate}
-                onTypeChange={setSelectedType}
-                onCourtChange={setSelectedCourt}
+                onDateChange={handleDateChange}
+                onTypeChange={handleTypeChange}
+                onCourtChange={handleCourtChange}
                 onReset={handleReset}
-                onApplyFilters={() => setIsExplicitSearch(true)}
+                onApplyFilters={handleApplyFilters}
                 selectedDate={selectedDate}
                 selectedType={selectedType}
                 selectedCourt={selectedCourt}
@@ -125,16 +162,16 @@ export default function ArchiveNoticesPage() {
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                       setIsExplicitSearch(false);
-                      setCurrentPage(1); // Reset to first page on search
+                      setCurrentPage(1);
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
                         setIsExplicitSearch(true);
-                        setCurrentPage(1); // Reset to first page on search
+                        setCurrentPage(1);
                       }
                     }}
-                    placeholder="Search by title, suit number etc."
+                    placeholder="Search by title, suit number, parties etc."
                     className="w-full border border-[#E5E7EB] p-3 pr-12"
                   />
                   <button 
@@ -143,7 +180,7 @@ export default function ArchiveNoticesPage() {
                     onClick={(e) => {
                       e.preventDefault();
                       setIsExplicitSearch(true);
-                      setCurrentPage(1); // Reset to first page on search
+                      setCurrentPage(1);
                     }}
                   >
                     <svg 
@@ -162,7 +199,7 @@ export default function ArchiveNoticesPage() {
                   </button>
                 </form>
                 <div className="text-[#64CCC5] mt-2">
-                  {filteredNotices.length} results
+                  {filteredNotices.length} {filteredNotices.length === 1 ? 'result' : 'results'}
                 </div>
               </div>
 
@@ -188,6 +225,16 @@ export default function ArchiveNoticesPage() {
                     expiryDate={notice.expiryDate}
                   />
                 ))}
+
+                {paginatedNotices.length === 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-8 text-[#464646]"
+                  >
+                    No notices found matching your criteria
+                  </motion.div>
+                )}
               </motion.div>
 
               {/* Pagination */}

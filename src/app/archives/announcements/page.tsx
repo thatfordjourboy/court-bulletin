@@ -9,11 +9,14 @@ import ArchiveAnnouncementCard from '@/components/archives/ArchiveAnnouncementCa
 import { useAnnouncements } from '@/hooks/useAnnouncements';
 import { motion } from 'framer-motion';
 import { stagger } from '@/utils/animations';
+import { NoticeType } from '@/types/notice';
 
 export default function ArchiveAnnouncementsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<NoticeType | null>(null);
+  const [selectedCourt, setSelectedCourt] = useState<string | null>(null);
   const [isExplicitSearch, setIsExplicitSearch] = useState(false);
   const itemsPerPage = 5;
 
@@ -22,6 +25,8 @@ export default function ArchiveAnnouncementsPage() {
     limit: itemsPerPage,
     search: isExplicitSearch ? searchQuery : '',
     date: selectedDate || '',
+    type: selectedType || '',
+    court: selectedCourt || '',
     archived: true
   });
 
@@ -94,6 +99,8 @@ export default function ArchiveAnnouncementsPage() {
   const handleReset = () => {
     setSearchQuery('');
     setSelectedDate(null);
+    setSelectedType(null);
+    setSelectedCourt(null);
     setCurrentPage(1);
   };
 
@@ -109,9 +116,13 @@ export default function ArchiveAnnouncementsPage() {
             <div className="w-[240px] shrink-0 bg-[#F3F5F8] p-5 lg:sticky lg:top-6 h-fit">
               <ArchiveAnnouncementFilters
                 onDateChange={setSelectedDate}
+                onTypeChange={setSelectedType}
+                onCourtChange={setSelectedCourt}
                 onReset={handleReset}
                 onApplyFilters={() => setIsExplicitSearch(true)}
                 selectedDate={selectedDate}
+                selectedType={selectedType}
+                selectedCourt={selectedCourt}
               />
             </div>
 
